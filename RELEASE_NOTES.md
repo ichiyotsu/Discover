@@ -8,15 +8,15 @@ Luma 的地址栏与工具栏作为一个整体停靠在窗口顶部或底部，
 
 | 平台 | 文件 | 说明 |
 | --- | --- | --- |
-| Windows x64 | `Luma-0.1.0-win-x64.zip` | 解压后运行 `Luma-win32-x64/Luma.exe` |
 | Android 12+ | `Luma-0.1.0-android.apk` | 系统 WebView / Chromium，使用调试密钥签名 |
+| Windows x64 | 源码 | 运行 `pnpm install && pnpm package` 生成便携包 |
+| 全部源码 | Source code (zip) | GitHub 自动生成 |
+
+> Windows 便携包约 218MB，本次未随 Release 上传，避免超出发布带宽；桌面端源码、构建脚本与文档已完整发布。
 
 SHA-256：
 
 ```text
-Luma-0.1.0-win-x64.zip
-3CDB63770D38CC1AB4E09BA06EC60C58A52A648B73D0D3B27E3CA51E82629A76
-
 Luma-0.1.0-android.apk
 D2B8C269C3824671991570DD920C4D6487B30AC94A329C288D1E0C5C265B6FFD
 ```

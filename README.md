@@ -12,10 +12,11 @@
 
 ## 下载
 
-Release **0.1.0** 提供两个平台：
+Release **0.1.0**：
 
-- **Windows x64**：`Luma-0.1.0-win-x64.zip`，解压后运行 `Luma.exe`。
 - **Android**：`Luma-0.1.0-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。
+- **Windows x64**：源码随仓库发布；运行 `pnpm install && pnpm package` 生成便携包。218MB 的便携包本次未随 Release 上传。
+- **源码**：GitHub 自动生成 Source code zip。
 
 前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/v0.1.0) 下载。
 
