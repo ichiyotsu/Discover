@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Field Notes — Designing calm software</title>
+  <style>
+    :root {
+      --paper: #f4f0e7;
+      --ink: #1b1b19;
+      --muted: #68645c;
+      --line: #d8d2c6;
+      --accent: #b6462d;
+      --green: #2f5947;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Georgia", "Noto Serif SC", "Songti SC", serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      padding: 20px clamp(24px, 5vw, 72px);
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+    }
+    .brand { font-weight: 800; letter-spacing: -0.03em; font-size: 18px; }
+    .brand span { color: var(--accent); }
+    nav { display: flex; gap: 24px; font-size: 12px; color: var(--muted); }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+    .issue {
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 54px clamp(24px, 5vw, 72px) 90px; }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--accent);
+      font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .kicker::before { content: ""; width: 28px; height: 1px; background: currentColor; }
+    h1 {
+      max-width: 920px;
+      margin: 22px 0 20px;
+      font-size: clamp(48px, 7.5vw, 104px);
+      font-weight: 400;
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+    }
+    h1 em { color: var(--accent); font-style: italic; }
+    .deck {
+      max-width: 610px;
+      margin: 0;
+      color: var(--muted);
+      font-family: "Segoe UI", "Noto Sans SC", sans-serif;
+      font-size: clamp(15px, 1.4vw, 19px);
+      line-height: 1.65;
+    }
+    .byline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 18px;
+      margin-top: 34px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      font-family: "Segoe UI", sans-serif;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .byline strong { color: var(--ink); font-weight: 600; }
+    .hero-art {
+      position: relative;
+      height: clamp(260px, 42vw, 460px);
+      margin: 42px 0 48px;
+      overflow: hidden;
+      border-radius: 4px;
+      background: #ded5c3;
+    }
+    .hero-art::before {
+      content: "";
+      position: absolute;
+      width: 58%;
+      height: 150%;
+      left: 12%;
+      top: -25%;
+      background: var(--green);
+      transform: rotate(18deg);
+    }
+    .hero-art::after {
+      content: "";
+      position: absolute;
+      width: 34%;
+      aspect-ratio: 1;
+      right: 10%;
+      top: 20%;
+      border: 2px solid #efe8da;
+      border-radius: 50%;
+      box-shadow: 0 0 0 30px rgb(239 232 218 / 0.12), 0 0 0 60px rgb(239 232 218 / 0.08);
+    }
+    .art-label {
+      position: absolute;
+      z-index: 2;
+      left: 26px;
+      bottom: 22px;
+      color: #f6f1e7;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(220px, 0.8fr); gap: 60px; }
+    article p {
+      margin: 0 0 1.2em;
+      font-size: 18px;
+      line-height: 1.82;
+      color: #35332e;
+    }
+    article p:first-of-type::first-letter {
+      float: left;
+      margin: 8px 10px 0 0;
+      color: var(--accent);
+      font-size: 74px;
+      line-height: 0.72;
+    }
+    h2 { margin: 1.7em 0 0.6em; font-size: 30px; font-weight: 400; letter-spacing: -0.03em; }
+    aside { border-left: 1px solid var(--line); padding-left: 26px; }
+    aside h3 { margin: 0 0 14px; font-family: "Segoe UI", sans-serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+    .note { margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--line); font-family: "Segoe UI", "Noto Sans SC", sans-serif; font-size: 12px; line-height: 1.65; color: var(--muted); }
+    .note strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 13px; }
+    .tag { display: inline-block; margin: 0 5px 6px 0; padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 10px; color: var(--muted); }
+    blockquote { margin: 2em 0; padding: 8px 0 8px 26px; border-left: 3px solid var(--accent); font-size: 26px; line-height: 1.4; letter-spacing: -0.02em; }
+    footer { margin-top: 70px; padding-top: 24px; border-top: 1px solid var(--line); font-family: "Segoe UI", sans-serif; font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; gap: 20px; }
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; gap: 36px; }
+      aside { border-left: 0; border-top: 1px solid var(--line); padding: 24px 0 0; }
+      nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">Field<span>.</span>Notes</div>
+    <nav>
+      <a href="#essay">Essays</a>
+      <a href="#objects">Objects</a>
+      <a href="#about">About</a>
+    </nav>
+    <div class="issue">Issue 07 · Slow Web</div>
+  </header>
+
+  <main>
+    <div class="kicker">Essay · Interface</div>
+    <h1>Designing calm software in a <em>noisy</em> world.</h1>
+    <p class="deck">The best interfaces do not ask for attention. They wait, quietly, until you need them. A field guide to building tools that feel like a deep breath.</p>
+    <div class="byline">
+      <strong>Mira Chen</strong>
+      <span>October 24, 2026</span>
+      <span>9 min read</span>
+      <span>Illustration by A. Bell</span>
+    </div>
+
+    <div class="hero-art" id="essay">
+      <span class="art-label">A study in negative space</span>
+    </div>
+
+    <div class="layout">
+      <article>
+        <p>We have spent two decades making software louder. More badges, more banners, more gentle nudges that arrive with the persistence of weather. The result is a kind of ambient anxiety: a low hum of unfinished things.</p>
+        <p>Calm software begins with a different question. Not “what else can we show?” but “what can we remove without losing the thread?” It treats attention as a finite material, the way a print designer treats paper.</p>
+        <h2>The shape of quiet</h2>
+        <p>Quiet is not the absence of color. A bright coral button can be calm if it is the only bright thing on the screen. The discipline is contrast: one loud note, surrounded by room to breathe.</p>
+        <blockquote>Good tools recede, but they do not disappear. They leave a trail of breadcrumbs back to the work.</blockquote>
+        <p>Motion matters here too. A panel that springs open like a held breath is friendly; one that slides for six hundred milliseconds is a small tax paid every time. Springs should settle quickly, and never block the next action.</p>
+        <h2>Build for the second visit</h2>
+        <p>The first visit is a performance. The second visit is a relationship. Calm software remembers what you were doing, keeps your place, and does not reset the room while you are still in it.</p>
+        <p>That is the standard we are chasing: a surface that feels alive but not demanding. Something that makes room for the person using it.</p>
+      </article>
+
+      <aside id="objects">
+        <h3>Field notes</h3>
+        <div class="note">
+          <strong>On default shapes</strong>
+          A pill is not inherently friendly. It becomes friendly when its corner radius matches the way the eye moves through the layout.
+        </div>
+        <div class="note">
+          <strong>On color</strong>
+          Start with one seed. Let the surfaces carry the tint. Reserve pure white for the thing you want people to touch.
+        </div>
+        <div class="note">
+          <strong>Filed under</strong>
+          <span class="tag">interface</span>
+          <span class="tag">attention</span>
+          <span class="tag">craft</span>
+        </div>
+      </aside>
+    </div>
+
+    <footer id="about">
+      <span>Field Notes is an independent journal about the made world.</span>
+      <span>No trackers. No autoplay. Just words.</span>
+    </footer>
+  </main>
+</body>
+</html>

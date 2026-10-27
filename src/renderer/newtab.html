@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>新标签页 · Luma</title>
+  <link rel="stylesheet" href="vendor/md3e/tokens.css">
+  <link rel="stylesheet" href="newtab.css">
+  <script type="module" src="newtab.js"></script>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true">
+    <span class="blob blob-a"></span>
+    <span class="blob blob-b"></span>
+    <span class="blob blob-c"></span>
+    <span class="grain"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32">
+          <path class="brand-spark" d="M16 3.2c1.1 6.5 4.3 9.7 10.8 10.8-6.5 1.1-9.7 4.3-10.8 10.8-1.1-6.5-4.3-9.7-10.8-10.8C11.7 12.9 14.9 9.7 16 3.2Z"/>
+          <circle class="brand-orbit" cx="24.6" cy="7.4" r="2.1"/>
+        </svg>
+      </span>
+      <span class="brand-name">Luma</span>
+    </div>
+    <div class="topbar-meta">
+      <span class="local-chip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 5.2 6v5.4c0 4 2.8 6.6 6.8 8.1 4-1.5 6.8-4.1 6.8-8.1V6Z"/><path d="m9.2 11.9 2 2 3.8-4"/></svg>
+        本地新标签页
+      </span>
+      <span class="topbar-date" id="topbar-date"></span>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="intro">
+      <div class="eyebrow-row">
+        <span class="pulse-dot" aria-hidden="true"></span>
+        <span id="greeting-line">下午好</span>
+        <span class="eyebrow-separator" aria-hidden="true"></span>
+        <span id="weather-note">为自己留一点探索的空间</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-line" id="greeting">下午好。</span>
+        <span class="hero-line hero-accent">今天想去哪里？</span>
+      </h1>
+
+      <form class="search" id="search-form" role="search">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.8" cy="10.8" r="6.6"/>
+          <path d="m15.7 15.7 4.2 4.2"/>
+        </svg>
+        <input class="search-input" id="search-input" type="text" autocomplete="off"
+          autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"
+          placeholder="搜索网页，或输入网址" aria-label="搜索或输入网址">
+        <span class="search-engine" id="search-engine">Bing</span>
+        <button class="search-submit" type="submit" aria-label="搜索">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h11"/><path d="m12.5 6.8 5.2 5.2-5.2 5.2"/></svg>
+        </button>
+      </form>
+
+      <div class="suggestions-row" aria-label="试试这些搜索">
+        <span class="suggestions-label">灵感</span>
+        <button class="idea-chip" type="button" data-query="Material 3 Expressive 设计原则">Material 3 Expressive</button>
+        <button class="idea-chip" type="button" data-query="今天有什么值得读的科技新闻">今日科技</button>
+        <button class="idea-chip" type="button" data-query="用 CSS 做悬浮玻璃效果">玻璃拟态 CSS</button>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="clock-card">
+        <div class="clock-head">
+          <span class="clock-label">现在</span>
+          <span class="clock-day" id="clock-day">星期一</span>
+        </div>
+        <strong class="clock-time" id="clock-time">00:00</strong>
+        <span class="clock-date" id="clock-date">1月1日</span>
+        <span class="clock-decoration" aria-hidden="true"></span>
+      </div>
+
+      <div class="links-panel" id="links-panel">
+        <div class="links-head">
+          <span>常去的地方</span>
+          <span class="links-hint">快捷方式</span>
+        </div>
+        <div class="links-grid" id="links-grid">
+          <a class="link-tile" href="https://github.com" style="--tile:#24292F;--tile-fg:#FFFFFF">
+            <span class="link-monogram">GH</span>
+            <span class="link-copy"><strong>GitHub</strong><span>github.com</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+          <a class="link-tile" href="https://www.bilibili.com" style="--tile:#FB7299;--tile-fg:#FFFFFF">
+            <span class="link-monogram">B</span>
+            <span class="link-copy"><strong>哔哩哔哩</strong><span>bilibili.com</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+          <a class="link-tile" href="https://www.youtube.com" style="--tile:#FF0033;--tile-fg:#FFFFFF">
+            <span class="link-monogram">YT</span>
+            <span class="link-copy"><strong>YouTube</strong><span>youtube.com</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+          <a class="link-tile" href="https://www.zhihu.com" style="--tile:#0066FF;--tile-fg:#FFFFFF">
+            <span class="link-monogram">知</span>
+            <span class="link-copy"><strong>知乎</strong><span>zhihu.com</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+          <a class="link-tile" href="https://zh.wikipedia.org" style="--tile:#54595D;--tile-fg:#FFFFFF">
+            <span class="link-monogram">W</span>
+            <span class="link-copy"><strong>维基百科</strong><span>wikipedia.org</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+          <a class="link-tile" href="https://sspai.com" style="--tile:#D71A1B;--tile-fg:#FFFFFF">
+            <span class="link-monogram">少</span>
+            <span class="link-copy"><strong>少数派</strong><span>sspai.com</span></span>
+            <svg class="link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8.2 7H17v8.8"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span class="footer-brand">Luma <span aria-hidden="true">·</span> Material 3 Expressive</span>
+    <span class="footer-hints">
+      <span><kbd>Ctrl</kbd><kbd>L</kbd> 地址栏</span>
+      <span><kbd>Ctrl</kbd><kbd>T</kbd> 新标签页</span>
+      <span><kbd>Ctrl</kbd><kbd>,</kbd> 设置</span>
+    </span>
+  </footer>
+</body>
+</html>

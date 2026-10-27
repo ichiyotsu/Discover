@@ -1,0 +1,28 @@
+{
+  "name": "luma-browser",
+  "productName": "Luma",
+  "version": "0.1.0",
+  "description": "Luma — a Material 3 Expressive browser built on the Chromium engine with md3e.",
+  "main": "src/main/main.js",
+  "author": "Luma",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "sync:vendor": "node scripts/sync-vendor.mjs",
+    "start": "node scripts/sync-vendor.mjs && electron .",
+    "dev": "node scripts/sync-vendor.mjs && electron . --dev",
+    "package": "node scripts/package.mjs",
+    "test:ui": "node tests/ui-smoke.mjs",
+    "test:flow": "node tests/browser-flow.mjs",
+    "test:packaged": "node tests/packaged-smoke.mjs",
+    "capture": "node tests/capture-docs.mjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^45.0.0",
+    "playwright-core": "^1.64.1"
+  },
+  "dependencies": {
+    "@materialwebunofficial/md3e-web": "^1.0.14"
+  }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-toolbar="top">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self'; connect-src 'self'; frame-src https: http: file:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Luma</title>
+  <link rel="stylesheet" href="vendor/md3e/tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="boot.js"></script>
+</head>
+<body>
+  <svg class="svg-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.8 5.3 8.1 12l6.7 6.7"/></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="m9.2 5.3 6.7 6.7-6.7 6.7"/></symbol>
+    <symbol id="i-reload" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2.4"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-maximize" viewBox="0 0 24 24"><rect x="5.5" y="5.5" width="13" height="13" rx="2"/></symbol>
+    <symbol id="i-restore" viewBox="0 0 24 24"><rect x="5" y="8" width="10" height="10" rx="1.8"/><path d="M9 5h8a2 2 0 0 1 2 2v8"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.2" r="1.15" class="fill"/><circle cx="12" cy="12" r="1.15" class="fill"/><circle cx="12" cy="18.8" r="1.15" class="fill"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.8" y="10.5" width="14.4" height="9.5" rx="3"/><path d="M8.4 10.5V7.8a3.6 3.6 0 0 1 7.2 0v2.7"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M3.8 12h16.4M12 3.8c2.2 2.3 3.3 5 3.3 8.2s-1.1 5.9-3.3 8.2c-2.2-2.3-3.3-5-3.3-8.2S9.8 6.1 12 3.8Z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.9 2.5 5.1 5.6.8-4 4 .9 5.6-5-2.7-5 2.7.9-5.6-4-4 5.6-.8Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m15.7 15.7 4.2 4.2"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M4.2 10a8.2 8.2 0 1 1 .9 5.7"/><path d="M4.2 4.8V10H9.4"/><path d="M12 7.7V12l2.8 1.8"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M5 7h5M14 7h5M5 17h5M14 17h5"/><circle cx="12" cy="7" r="2.1"/><circle cx="12" cy="17" r="2.1"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4.5v10M7.7 10.5 12 14.8l4.3-4.3"/><path d="M5 18.5h14"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.3"/><path d="M12 11v5.2"/><circle cx="12" cy="7.8" r=".9" class="fill"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-7.4 7.4"/><path d="M18.5 13.5v4a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2v-10a2 2 0 0 1 2-2h4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="10.5" height="10.5" rx="2.5"/><path d="M15.5 8.5v-2a2.5 2.5 0 0 0-2.5-2.5H7.5A2.5 2.5 0 0 0 5 6.5V12a2.5 2.5 0 0 0 2.5 2.5h1"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="m12 4.5 8.2 14.2H3.8Z"/><path d="M12 9.4v4.3"/><circle cx="12" cy="16.4" r=".9" class="fill"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.4c.7 4.5 3.1 6.9 7.6 7.6-4.5.7-6.9 3.1-7.6 7.6-.7-4.5-3.1-6.9-7.6-7.6 4.5-.7 6.9-3.1 7.6-7.6Z"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 4.8h11a1 1 0 0 1 1 1v14.4L12 16l-6.5 4.2V5.8a1 1 0 0 1 1-1Z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.8 7h14.4M9 7V4.8h6V7M6.7 7l.8 12.2h9l.8-12.2M10 10.7v5.2M14 10.7v5.2"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.8 7.5A2.5 2.5 0 0 1 6.3 5h3.4l2 2.3h6A2.5 2.5 0 0 1 20.2 10v7a2.5 2.5 0 0 1-2.5 2.5H6.3a2.5 2.5 0 0 1-2.5-2.5Z"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="3.2" y="6.2" width="17.6" height="11.6" rx="2.6"/><path d="M6.7 10h.1M10 10h.1M13.3 10h.1M16.6 10h.1M6.7 13.2h.1M10 13.2h.1M13.3 13.2h.1M16.6 13.2h.1M8.4 16h7.2"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.8a8.2 8.2 0 0 0 0 16.4h1.2a1.8 1.8 0 0 0 0-3.6h-.7a1.7 1.7 0 0 1 0-3.4h3.3a4.2 4.2 0 0 0 4.2-4.2c0-2.9-3.6-5.2-8-5.2Z"/><circle cx="8" cy="9" r="1" class="fill"/><circle cx="12.2" cy="6.9" r="1" class="fill"/><circle cx="16.2" cy="9.1" r="1" class="fill"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.4 4.6 4.6L19 6.9"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8.2 7H17v8.8"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></symbol>
+    <symbol id="i-layout" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="15" rx="3"/><path d="M4 9h16"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.3 14.3A7.8 7.8 0 0 1 9.7 4.7a7.8 7.8 0 1 0 9.6 9.6Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M18.5 5.5 17 7M7 17l-1.5 1.5"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3.5" y="4.8" width="17" height="12" rx="2.5"/><path d="M9 20h6M12 16.8V20"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m4.4 10.7 7.6-6.4 7.6 6.4"/><path d="M6.3 9.4v9.2h11.4V9.4"/><path d="M10 18.6v-5h4v5"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3.8v7.5"/><path d="M7 6.7a7.6 7.6 0 1 0 10 0"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 5.2 6v5.4c0 4 2.8 6.6 6.8 8.1 4-1.5 6.8-4.1 6.8-8.1V6Z"/><path d="m9.2 11.9 2 2 3.8-4"/></symbol>
+    <symbol id="i-tab" viewBox="0 0 24 24"><path d="M5 8.5V6.8A1.8 1.8 0 0 1 6.8 5h4.1l2 2.2h4.3A1.8 1.8 0 0 1 19 8.9v8.3a1.8 1.8 0 0 1-1.8 1.8H6.8A1.8 1.8 0 0 1 5 17.2Z"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 10a7.8 7.8 0 1 1 .9 5.4"/><path d="M4.5 4.8V10H9.7"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="m4.8 16.7-.7 3.2 3.2-.7L18.6 7.9a2.3 2.3 0 0 0 0-3.2l-.3-.3a2.3 2.3 0 0 0-3.2 0Z"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.2" class="fill"/><circle cx="12" cy="12" r="1.2" class="fill"/><circle cx="18.5" cy="12" r="1.2" class="fill"/></symbol>
+  </svg>
+
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient-blob ambient-one"></span>
+    <span class="ambient-blob ambient-two"></span>
+    <span class="ambient-blob ambient-three"></span>
+    <span class="ambient-grain"></span>
+  </div>
+
+  <header class="chrome" id="chrome">
+    <div class="tab-row" id="tab-row">
+      <div class="brand" id="brand" title="Luma" aria-label="Luma">
+        <span class="brand-mark">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path class="brand-spark" d="M16 3.2c1.1 6.5 4.3 9.7 10.8 10.8-6.5 1.1-9.7 4.3-10.8 10.8-1.1-6.5-4.3-9.7-10.8-10.8C11.7 12.9 14.9 9.7 16 3.2Z"/>
+            <circle class="brand-orbit" cx="24.6" cy="7.4" r="2.1"/>
+          </svg>
+        </span>
+      </div>
+
+      <div class="tabs-viewport" id="tabs-viewport">
+        <div class="tabs" id="tabs" role="tablist" aria-label="标签页"></div>
+      </div>
+
+      <button class="chrome-button new-tab-button" id="new-tab-button" type="button" aria-label="新建标签页" title="新建标签页 (Ctrl+T)">
+        <svg class="icon"><use href="#i-plus"></use></svg>
+      </button>
+
+      <div class="drag-region" id="drag-region" aria-hidden="true"></div>
+
+      <div class="window-controls" id="window-controls">
+        <button class="window-control" id="window-minimize" type="button" aria-label="最小化" title="最小化">
+          <svg class="icon"><use href="#i-minus"></use></svg>
+        </button>
+        <button class="window-control" id="window-maximize" type="button" aria-label="最大化" title="最大化">
+          <svg class="icon"><use href="#i-maximize"></use></svg>
+        </button>
+        <button class="window-control close" id="window-close" type="button" aria-label="关闭" title="关闭">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="toolbar-wrap">
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="浏览器工具栏">
+        <div class="nav-group">
+          <button class="tool-button nav-button" id="back-button" type="button" aria-label="后退" title="后退 (Alt+←)" disabled>
+            <svg class="icon"><use href="#i-back"></use></svg>
+          </button>
+          <button class="tool-button nav-button" id="forward-button" type="button" aria-label="前进" title="前进 (Alt+→)" disabled>
+            <svg class="icon"><use href="#i-forward"></use></svg>
+          </button>
+          <button class="tool-button nav-button" id="reload-button" type="button" aria-label="重新加载" title="重新加载 (Ctrl+R)">
+            <svg class="icon"><use id="reload-use" href="#i-reload"></use></svg>
+          </button>
+        </div>
+
+        <div class="omnibox" id="omnibox">
+          <button class="site-chip" id="site-chip" type="button" aria-label="站点信息" title="站点信息">
+            <svg class="icon" id="site-icon"><use href="#i-globe"></use></svg>
+          </button>
+          <div class="url-shell" id="url-shell">
+            <div class="url-display" id="url-display" aria-hidden="true"></div>
+            <input class="url-input" id="url-input" type="text" aria-label="地址栏" autocomplete="off"
+              autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go"
+              placeholder="搜索网页或输入网址" aria-controls="suggestions" aria-expanded="false">
+          </div>
+          <button class="tool-button star-button" id="star-button" type="button" aria-label="添加书签" title="添加书签">
+            <svg class="icon"><use href="#i-star"></use></svg>
+          </button>
+        </div>
+
+        <button class="tool-button menu-button" id="menu-button" type="button" aria-label="浏览器菜单" title="菜单">
+          <svg class="icon"><use href="#i-more"></use></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-stage" id="page-stage">
+    <div class="page-frame" id="page-frame">
+      <div class="webviews" id="webviews"></div>
+
+      <div class="page-progress" id="page-progress-container" hidden>
+        <md-progress-indicator id="page-progress" type="linear" variant="wavy" indeterminate></md-progress-indicator>
+      </div>
+
+      <section class="error-overlay" id="error-overlay" hidden aria-live="polite">
+        <div class="error-card">
+          <div class="error-visual" aria-hidden="true">
+            <span class="error-orbit"></span>
+            <span class="error-glyph"><svg class="icon"><use href="#i-warning"></use></svg></span>
+          </div>
+          <span class="eyebrow">连接没有建立</span>
+          <h1 class="error-title" id="error-title">无法访问此网站</h1>
+          <p class="error-detail" id="error-detail">页面暂时无法加载。检查网络连接，或稍后重试。</p>
+          <code class="error-url" id="error-url"></code>
+          <div class="error-actions">
+            <md-button variant="filled" label="重新加载" id="error-retry"></md-button>
+            <md-button variant="text" label="返回上一页" id="error-back"></md-button>
+          </div>
+          <span class="error-code" id="error-code"></span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="suggestions" id="suggestions" hidden>
+    <div class="suggestions-list" id="suggestions-list" role="listbox" aria-label="地址建议"></div>
+    <div class="suggestions-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>Enter</kbd> 打开</span>
+      <span><kbd>Esc</kbd> 关闭</span>
+    </div>
+  </div>
+
+  <div class="site-popover glass-popover" id="site-popover" hidden role="dialog" aria-label="站点信息">
+    <div class="site-popover-head">
+      <span class="site-popover-icon" id="site-popover-icon"><svg class="icon"><use href="#i-lock"></use></svg></span>
+      <div>
+        <strong id="site-popover-title">连接安全</strong>
+        <span id="site-popover-origin">example.com</span>
+      </div>
+    </div>
+    <p class="site-popover-text" id="site-popover-text">此网站使用 HTTPS 加密连接。</p>
+    <button class="popover-action" id="site-copy" type="button">
+      <svg class="icon"><use href="#i-copy"></use></svg>
+      复制网址
+    </button>
+  </div>
+
+  <div class="app-menu glass-popover" id="app-menu" hidden role="menu" aria-label="浏览器菜单">
+    <div class="menu-section-label">Luma</div>
+    <button class="menu-item" data-command="new-tab" role="menuitem">
+      <svg class="icon"><use href="#i-plus"></use></svg><span>新建标签页</span><kbd>Ctrl T</kbd>
+    </button>
+    <div class="menu-separator"></div>
+    <button class="menu-item" data-command="library" data-library="history" role="menuitem">
+      <svg class="icon"><use href="#i-history"></use></svg><span>历史记录</span><kbd>Ctrl H</kbd>
+    </button>
+    <button class="menu-item" data-command="library" data-library="bookmarks" role="menuitem">
+      <svg class="icon"><use href="#i-bookmark"></use></svg><span>书签</span>
+    </button>
+    <button class="menu-item" data-command="downloads" role="menuitem">
+      <svg class="icon"><use href="#i-download"></use></svg><span>下载内容</span><kbd>Ctrl J</kbd>
+    </button>
+    <div class="menu-separator"></div>
+    <button class="menu-item" data-command="settings" role="menuitem">
+      <svg class="icon"><use href="#i-settings"></use></svg><span>设置</span><kbd>Ctrl ,</kbd>
+    </button>
+    <button class="menu-item" data-command="shortcuts" role="menuitem">
+      <svg class="icon"><use href="#i-keyboard"></use></svg><span>键盘快捷键</span>
+    </button>
+    <button class="menu-item" data-command="about" role="menuitem">
+      <svg class="icon"><use href="#i-info"></use></svg><span>关于 Luma</span>
+    </button>
+    <div class="menu-separator"></div>
+    <button class="menu-item" data-command="quit" role="menuitem">
+      <svg class="icon"><use href="#i-power"></use></svg><span>退出 Luma</span><kbd>Alt F4</kbd>
+    </button>
+  </div>
+
+  <div class="panel-scrim" id="panel-scrim" hidden></div>
+  <aside class="side-panel" id="side-panel" hidden aria-label="浏览记录">
+    <header class="panel-header">
+      <div>
+        <span class="eyebrow">你的浏览足迹</span>
+        <h2 id="panel-title">历史记录</h2>
+      </div>
+      <button class="chrome-button" id="panel-close" type="button" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+    </header>
+    <div class="panel-tabs" role="tablist" aria-label="浏览记录类型">
+      <button class="panel-tab active" data-panel="history" role="tab" aria-selected="true">历史记录</button>
+      <button class="panel-tab" data-panel="bookmarks" role="tab" aria-selected="false">书签</button>
+    </div>
+    <label class="panel-search">
+      <svg class="icon"><use href="#i-search"></use></svg>
+      <input id="panel-filter" type="search" placeholder="搜索历史记录" autocomplete="off">
+    </label>
+    <div class="panel-list" id="panel-list"></div>
+    <footer class="panel-footer">
+      <span id="panel-count">0 条记录</span>
+      <button class="text-button danger" id="panel-clear" type="button">清空</button>
+    </footer>
+  </aside>
+
+  <md-dialog id="settings-dialog" headline="设置" supporting-text="把 Luma 调成你顺手的样子。所有更改会立即生效。">
+    <div class="settings">
+      <section class="settings-section">
+        <div class="settings-heading">
+          <div>
+            <h3>工具栏位置</h3>
+            <p>地址栏和工具栏作为一个悬浮组件，一起停靠在窗口顶部或底部。</p>
+          </div>
+          <span class="settings-badge">实时</span>
+        </div>
+        <div class="position-options" role="radiogroup" aria-label="工具栏位置">
+          <button class="position-option" type="button" data-position="top" role="radio" aria-checked="false">
+            <span class="position-preview" aria-hidden="true">
+              <span class="position-page"></span>
+              <span class="position-chrome"><i></i><i></i><i></i></span>
+            </span>
+            <span class="position-label">
+              <span>顶部</span>
+              <span class="position-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+            </span>
+          </button>
+          <button class="position-option" type="button" data-position="bottom" role="radio" aria-checked="false">
+            <span class="position-preview bottom" aria-hidden="true">
+              <span class="position-page"></span>
+              <span class="position-chrome"><i></i><i></i><i></i></span>
+            </span>
+            <span class="position-label">
+              <span>底部</span>
+              <span class="position-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="settings-heading">
+          <div>
+            <h3>外观</h3>
+            <p>选择明暗模式，并让整个界面从一颗主题色种子中生长出来。</p>
+          </div>
+        </div>
+        <md-segmented-button id="theme-segmented" items='["跟随系统","浅色","深色"]' selected-index="0" aria-label="明暗模式"></md-segmented-button>
+        <div class="seed-block">
+          <span class="field-label">主题色</span>
+          <div class="seed-grid" id="seed-grid">
+            <button class="seed-chip" type="button" data-seed="#5B5BD6" style="--seed:#5B5BD6" aria-label="鸢尾蓝"></button>
+            <button class="seed-chip" type="button" data-seed="#006A6A" style="--seed:#006A6A" aria-label="湖水青"></button>
+            <button class="seed-chip" type="button" data-seed="#8B4A62" style="--seed:#8B4A62" aria-label="玫瑰灰"></button>
+            <button class="seed-chip" type="button" data-seed="#7A5900" style="--seed:#7A5900" aria-label="琥珀金"></button>
+            <button class="seed-chip" type="button" data-seed="#4A6548" style="--seed:#4A6548" aria-label="苔藓绿"></button>
+            <button class="seed-chip" type="button" data-seed="#984061" style="--seed:#984061" aria-label="洋红"></button>
+            <button class="seed-chip" type="button" data-seed="#3A5F9E" style="--seed:#3A5F9E" aria-label="远山蓝"></button>
+            <button class="seed-chip" type="button" data-seed="#8A4F00" style="--seed:#8A4F00" aria-label="赤陶"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-section">
+        <div class="settings-heading">
+          <div>
+            <h3>搜索引擎</h3>
+            <p>地址栏和新标签页会使用同一个搜索来源。</p>
+          </div>
+        </div>
+        <md-segmented-button id="engine-segmented" items='["Bing","Google","DuckDuckGo"]' selected-index="0" aria-label="搜索引擎"></md-segmented-button>
+      </section>
+
+      <section class="settings-section switches">
+        <div class="switch-row">
+          <div>
+            <h3>新标签页快捷方式</h3>
+            <p>在新标签页展示常用网站。</p>
+          </div>
+          <md-switch id="shortcuts-switch" checked aria-label="新标签页快捷方式"></md-switch>
+        </div>
+        <div class="switch-row">
+          <div>
+            <h3>悬浮玻璃效果</h3>
+            <p>为工具栏添加背景模糊；关闭后更省性能。</p>
+          </div>
+          <md-switch id="transparency-switch" checked aria-label="悬浮玻璃效果"></md-switch>
+        </div>
+      </section>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-button variant="text" label="恢复默认" id="settings-reset"></md-button>
+      <md-button variant="filled" label="完成" id="settings-done"></md-button>
+    </div>
+  </md-dialog>
+
+  <md-dialog id="about-dialog" headline="关于 Luma" supporting-text="一个把地址栏放进悬浮玻璃胶囊的 Material 3 Expressive 浏览器。">
+    <div class="about">
+      <div class="about-logo" aria-hidden="true">
+        <span class="brand-mark large">
+          <svg viewBox="0 0 32 32">
+            <path class="brand-spark" d="M16 3.2c1.1 6.5 4.3 9.7 10.8 10.8-6.5 1.1-9.7 4.3-10.8 10.8-1.1-6.5-4.3-9.7-10.8-10.8C11.7 12.9 14.9 9.7 16 3.2Z"/>
+            <circle class="brand-orbit" cx="24.6" cy="7.4" r="2.1"/>
+          </svg>
+        </span>
+      </div>
+      <div class="about-title">
+        <strong>Luma</strong>
+        <span>版本 <span id="about-version">1.0.0</span></span>
+      </div>
+      <div class="about-meta">
+        <div><span>浏览器内核</span><strong>Chromium <span id="about-chrome">—</span></strong></div>
+        <div><span>界面系统</span><strong>md3e · Material 3 Expressive</strong></div>
+        <div><span>运行时</span><strong>Electron <span id="about-electron">—</span></strong></div>
+      </div>
+      <p class="about-note">Luma 使用 Chromium 渲染网页，使用 md3e 的令牌、主题引擎、弹簧动效和 Web Components 构建界面。部分流媒体 DRM 与需要原生 Google 登录的应用可能不可用。</p>
+      <button class="text-button about-link" id="about-project" type="button">
+        <svg class="icon"><use href="#i-arrow-up-right"></use></svg>
+        查看 md3e 设计文档
+      </button>
+    </div>
+    <div slot="actions">
+      <md-button variant="filled" label="好的" id="about-close"></md-button>
+    </div>
+  </md-dialog>
+
+  <md-dialog id="shortcuts-dialog" headline="键盘快捷键" supporting-text="像一个熟练的浏览器用户那样移动。">
+    <div class="shortcut-list">
+      <div class="shortcut-row"><span>聚焦地址栏</span><kbd>Ctrl L</kbd></div>
+      <div class="shortcut-row"><span>新建 / 关闭标签页</span><kbd>Ctrl T / Ctrl W</kbd></div>
+      <div class="shortcut-row"><span>切换标签页</span><kbd>Ctrl Tab</kbd></div>
+      <div class="shortcut-row"><span>重新打开关闭的标签页</span><kbd>Ctrl ⇧ T</kbd></div>
+      <div class="shortcut-row"><span>后退 / 前进</span><kbd>Alt ← / →</kbd></div>
+      <div class="shortcut-row"><span>重新加载</span><kbd>Ctrl R</kbd></div>
+      <div class="shortcut-row"><span>放大 / 缩小 / 重置</span><kbd>Ctrl + / − / 0</kbd></div>
+      <div class="shortcut-row"><span>设置</span><kbd>Ctrl ,</kbd></div>
+      <div class="shortcut-row"><span>全屏</span><kbd>F11</kbd></div>
+    </div>
+    <div slot="actions">
+      <md-button variant="filled" label="知道了" id="shortcuts-close"></md-button>
+    </div>
+  </md-dialog>
+
+  <div class="toast-region" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

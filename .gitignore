@@ -1,0 +1,24 @@
+node_modules/
+dist/
+out/
+*.log
+.DS_Store
+src/renderer/vendor/
+tests/artifacts/
+
+# Android build output and machine-specific files
+android/.gradle/
+android/.kotlin/
+android/.idea/
+android/build/
+android/app/build/
+android/local.properties
+android/*.iml
+android/*.hprof
+
+# Temporary emulator QA files (not part of the app)
+android/docs-*.png
+android/ui*.xml
+android/test-settings-*.xml
+android/parse_ui.py
+android/overlay_bounds.py
