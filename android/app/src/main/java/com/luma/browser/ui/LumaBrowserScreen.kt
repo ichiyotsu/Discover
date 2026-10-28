@@ -9,20 +9,27 @@ package com.luma.browser.ui
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.graphics.drawable.GradientDrawable
-import android.view.View
-import android.view.ViewOutlineProvider
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -38,15 +45,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -61,33 +67,33 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.core.content.FileProvider
 import com.luma.browser.browser.BrowserController
 import com.luma.browser.browser.BrowserTab
 import com.luma.browser.browser.PageError
 import com.luma.browser.data.HistoryEntry
 import com.luma.browser.data.LumaSettings
-import com.luma.browser.data.SearchEngine
 import com.luma.browser.data.ToolbarEdge
+import com.luma.browser.data.UpdateInfo
+import com.luma.browser.data.UpdateManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun LumaBrowserScreen(
@@ -99,6 +105,8 @@ fun LumaBrowserScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
+    val scope = rememberCoroutineScope()
+    val updateManager = remember { UpdateManager() }
 
     var showSettings by remember { mutableStateOf(false) }
     var showTabs by remember { mutableStateOf(false) }
@@ -106,29 +114,87 @@ fun LumaBrowserScreen(
     var addressEditing by remember { mutableStateOf(false) }
     var addressQuery by remember { mutableStateOf("") }
 
+    var updateInfo by remember { mutableStateOf<UpdateInfo?>(null) }
+    var checkingUpdate by remember { mutableStateOf(false) }
+    var downloadingUpdate by remember { mutableStateOf(false) }
+    var downloadProgress by remember { mutableStateOf(0f) }
+    var updateMessage by remember { mutableStateOf<String?>(null) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    var downloadedFile by remember { mutableStateOf<File?>(null) }
+
     val active = controller.activeTab
     val isTop = settings.edge == ToolbarEdge.TOP
     val topInset = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val chromeHeight = 64.dp
-    val gap = 8.dp
-    val pageGap = 6.dp
+    val collapsed = !isTop &&
+        settings.autoCollapseToolbar &&
+        controller.toolbarCollapsed &&
+        !addressEditing
 
-    val targetTop = if (isTop) topInset + gap + chromeHeight + pageGap else topInset + gap
-    val targetBottom = if (isTop) bottomInset + gap else bottomInset + gap + chromeHeight + pageGap
-    val pageTop by animateDpAsState(
-        targetValue = targetTop,
-        animationSpec = spring(dampingRatio = 0.84f, stiffness = 380f),
-        label = "pageTop",
-    )
-    val pageBottom by animateDpAsState(
-        targetValue = targetBottom,
-        animationSpec = spring(dampingRatio = 0.84f, stiffness = 380f),
-        label = "pageBottom",
-    )
+    fun checkForUpdates(manual: Boolean) {
+        if (checkingUpdate || downloadingUpdate) return
+        checkingUpdate = true
+        updateMessage = null
+        scope.launch {
+            val result = runCatching { updateManager.check(settings.updateChannel) }.getOrNull()
+            checkingUpdate = false
+            updateInfo = result
+            if (result != null) {
+                updateMessage = "发现新版本 ${result.version}"
+                if (!manual) showUpdateDialog = true
+            } else if (manual) {
+                updateMessage = "当前已是最新版本"
+            }
+        }
+    }
+
+    fun installUpdate() {
+        val info = updateInfo ?: return
+        val existing = downloadedFile
+        if (existing != null && existing.exists()) {
+            launchInstaller(context, existing)
+            return
+        }
+        if (downloadingUpdate) return
+        downloadingUpdate = true
+        downloadProgress = 0f
+        updateMessage = "正在下载 ${info.version}…"
+        scope.launch {
+            try {
+                val directory = File(context.cacheDir, "updates").apply { mkdirs() }
+                val file = File(directory, "Luma-${info.version}.apk")
+                updateManager.download(info, file) { downloadProgress = it }
+                downloadedFile = file
+                downloadingUpdate = false
+                updateMessage = "下载完成，正在打开安装器"
+                launchInstaller(context, file)
+            } catch (error: Exception) {
+                downloadingUpdate = false
+                updateMessage = "下载失败：${error.message ?: "网络错误"}"
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
-        delay(280)
+        if (settings.autoCheckUpdates) checkForUpdates(false)
+    }
+
+    LaunchedEffect(isTop, topInset, bottomInset) {
+        val density = context.resources.displayMetrics.density
+        val overlay = ((64 + 16) * density).toInt()
+        controller.setContentInsets(
+            top = if (isTop) overlay else 0,
+            bottom = if (isTop) 0 else overlay,
+        )
+    }
+
+    LaunchedEffect(addressEditing) {
+        if (addressEditing) controller.expandToolbar()
+    }
+
+    LaunchedEffect(Unit) {
+        delay(320)
         focusManager.clearFocus(force = true)
         keyboard?.hide()
     }
@@ -143,16 +209,10 @@ fun LumaBrowserScreen(
         onSheetRequestHandled()
     }
 
-    LaunchedEffect(controller.activeTabId) {
-        if (!addressEditing) {
-            addressQuery = ""
-        }
-    }
-
     fun leaveAddressMode() {
         addressEditing = false
         addressQuery = ""
-        focusManager.clearFocus()
+        focusManager.clearFocus(force = true)
         keyboard?.hide()
     }
 
@@ -179,58 +239,92 @@ fun LumaBrowserScreen(
             controller = controller,
             active = active,
             settings = settings,
-            onFocusAddress = { addressEditing = true },
+            isTop = isTop,
+            onFocusAddress = {
+                controller.expandToolbar()
+                addressEditing = true
+            },
             onOpenUrl = { url ->
                 leaveAddressMode()
                 controller.navigate(url)
             },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 10.dp, end = 10.dp, top = pageTop, bottom = pageBottom)
+                .padding(top = topInset, bottom = bottomInset)
                 .zIndex(1f),
         )
 
-        BrowserChrome(
-            controller = controller,
-            active = active,
-            settings = settings,
-            editing = addressEditing,
-            onOpenTabs = {
-                leaveAddressMode()
-                showTabs = true
-            },
-            onOpenSettings = {
-                leaveAddressMode()
-                showSettings = true
-            },
-            onOpenHistory = {
-                leaveAddressMode()
-                showHistory = true
-            },
-            onEditingChanged = { editing ->
-                addressEditing = editing
-                if (!editing) addressQuery = ""
-            },
-            onQueryChanged = { addressQuery = it },
-            onSubmit = ::navigateFromAddress,
+        Box(
             modifier = Modifier
                 .align(if (isTop) Alignment.TopCenter else Alignment.BottomCenter)
-                .then(
-                    if (isTop) Modifier.statusBarsPadding() else Modifier.navigationBarsPadding(),
-                )
+                .then(if (isTop) Modifier.statusBarsPadding() else Modifier.navigationBarsPadding())
                 .padding(horizontal = 12.dp)
                 .padding(
-                    top = if (isTop) gap else 0.dp,
-                    bottom = if (isTop) 0.dp else gap,
+                    top = if (isTop) 8.dp else 0.dp,
+                    bottom = if (isTop) 0.dp else 8.dp,
                 )
                 .fillMaxWidth()
                 .zIndex(10f),
-        )
+        ) {
+            AnimatedContent(
+                targetState = collapsed,
+                transitionSpec = {
+                    (
+                        fadeIn(tween(180)) +
+                            slideInVertically(tween(220)) { if (isTop) -it / 2 else it / 2 }
+                        ).togetherWith(
+                        fadeOut(tween(120)) +
+                            slideOutVertically(tween(160)) { if (isTop) -it / 2 else it / 2 },
+                    )
+                },
+                label = "browserChrome",
+            ) { isCollapsed ->
+                if (isCollapsed) {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CollapsedChrome(
+                            active = active,
+                            onExpand = { controller.expandToolbar() },
+                            modifier = Modifier.fillMaxWidth(0.76f),
+                        )
+                    }
+                } else {
+                    BrowserChrome(
+                        controller = controller,
+                        active = active,
+                        settings = settings,
+                        editing = addressEditing,
+                        onOpenTabs = {
+                            leaveAddressMode()
+                            controller.expandToolbar()
+                            showTabs = true
+                        },
+                        onOpenSettings = {
+                            leaveAddressMode()
+                            controller.expandToolbar()
+                            showSettings = true
+                        },
+                        onOpenHistory = {
+                            leaveAddressMode()
+                            controller.expandToolbar()
+                            showHistory = true
+                        },
+                        onTranslate = { controller.translateSelectionOrPage() },
+                        onEditingChanged = { editing ->
+                            addressEditing = editing
+                            if (!editing) addressQuery = ""
+                        },
+                        onQueryChanged = { addressQuery = it },
+                        onSubmit = ::navigateFromAddress,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+        }
 
         if (addressEditing && (addressQuery.isNotBlank() || controller.history.suggestions("").isNotEmpty())) {
             AddressSuggestions(
                 query = addressQuery,
-                engine = settings.engine,
+                settings = settings,
                 history = controller.history.suggestions(addressQuery, 4),
                 onSearch = { navigateFromAddress(it) },
                 onOpen = { url ->
@@ -242,8 +336,8 @@ fun LumaBrowserScreen(
                     .padding(
                         start = 16.dp,
                         end = 16.dp,
-                        top = if (isTop) topInset + gap + chromeHeight + pageGap else 0.dp,
-                        bottom = if (isTop) 0.dp else bottomInset + gap + chromeHeight + pageGap,
+                        top = if (isTop) topInset + chromeHeight + 12.dp else 0.dp,
+                        bottom = if (isTop) 0.dp else bottomInset + chromeHeight + 12.dp,
                     )
                     .fillMaxWidth()
                     .zIndex(9f),
@@ -252,18 +346,39 @@ fun LumaBrowserScreen(
     }
 
     if (showSettings) {
-        SettingsSheet(
+        SettingsScreen(
             settings = settings,
             history = controller.history,
-            onDismiss = { showSettings = false },
+            updateInfo = updateInfo,
+            checkingUpdate = checkingUpdate,
+            downloadingUpdate = downloadingUpdate,
+            downloadProgress = downloadProgress,
+            updateMessage = updateMessage,
+            onCheckUpdate = { checkForUpdates(true) },
+            onInstallUpdate = { installUpdate() },
+            onOpenReleasePage = {
+                runCatching {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/ichiyotsu/Discover/releases"),
+                        ),
+                    )
+                }
+            },
+            onOpenHistory = {
+                showSettings = false
+                showHistory = true
+            },
+            onClose = { showSettings = false },
         )
     }
 
     if (showTabs) {
-        TabsSheet(
+        TabSwitcherScreen(
             controller = controller,
-            active = active,
-            onDismiss = { showTabs = false },
+            settings = settings,
+            onClose = { showTabs = false },
             onNewTab = {
                 showTabs = false
                 controller.newTab()
@@ -272,12 +387,50 @@ fun LumaBrowserScreen(
     }
 
     if (showHistory) {
-        HistorySheet(
+        HistoryScreen(
             history = controller.history,
-            onDismiss = { showHistory = false },
-            onOpen = { url ->
-                showHistory = false
-                controller.navigate(url)
+            onClose = { showHistory = false },
+            onOpenUrl = { url -> controller.navigate(url) },
+        )
+    }
+
+    if (showUpdateDialog && updateInfo != null) {
+        val info = updateInfo!!
+        AlertDialog(
+            onDismissRequest = { if (!downloadingUpdate) showUpdateDialog = false },
+            title = { Text("Luma ${info.version} 可用") },
+            text = {
+                Column {
+                    Text(
+                        text = info.notes.take(500).ifBlank { "新版本已发布。" },
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    if (downloadingUpdate) {
+                        Spacer(Modifier.height(12.dp))
+                        LinearProgressIndicator(
+                            progress = { downloadProgress },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Text(
+                            text = "${(downloadProgress * 100).toInt()}%",
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { installUpdate() },
+                    enabled = !downloadingUpdate,
+                ) {
+                    Text(if (downloadingUpdate) "下载中…" else "下载并安装")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showUpdateDialog = false },
+                    enabled = !downloadingUpdate,
+                ) { Text("稍后") }
             },
         )
     }
@@ -288,28 +441,16 @@ private fun PageSurface(
     controller: BrowserController,
     active: BrowserTab?,
     settings: LumaSettings,
+    isTop: Boolean,
     onFocusAddress: () -> Unit,
     onOpenUrl: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val density = LocalDensity.current
-    val shape = RoundedCornerShape(26.dp)
     val pageColor = MaterialTheme.colorScheme.surfaceContainerLowest
     val frame = remember(pageColor) {
         FrameLayout(context).apply {
-            clipChildren = true
-            clipToOutline = true
-            outlineProvider = object : ViewOutlineProvider() {
-                override fun getOutline(view: View, outline: android.graphics.Outline) {
-                    val radius = with(density) { 26.dp.toPx() }
-                    outline.setRoundRect(0, 0, view.width, view.height, radius)
-                }
-            }
-            background = GradientDrawable().apply {
-                cornerRadius = with(density) { 26.dp.toPx() }
-                setColor(pageColor.toArgb())
-            }
+            setBackgroundColor(pageColor.toArgb())
         }
     }
 
@@ -318,23 +459,7 @@ private fun PageSurface(
         onDispose { controller.detachContainer(frame) }
     }
 
-    Box(
-        modifier = modifier
-            .shadow(
-                elevation = 22.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.20f),
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
-            )
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.40f),
-                shape,
-            ),
-    ) {
+    Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainerLowest)) {
         AndroidView(
             factory = { frame },
             modifier = Modifier.fillMaxSize(),
@@ -345,6 +470,8 @@ private fun PageSurface(
                 settings = settings,
                 onOpen = onOpenUrl,
                 onFocusAddress = onFocusAddress,
+                topContentPadding = if (isTop) 78.dp else 0.dp,
+                bottomContentPadding = if (isTop) 0.dp else 78.dp,
                 modifier = Modifier.fillMaxSize(),
             )
         }
@@ -363,7 +490,7 @@ private fun PageSurface(
                 progress = { active.progress.coerceIn(0.04f, 1f) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
+                    .height(3.dp)
                     .align(Alignment.TopCenter)
                     .zIndex(4f),
                 color = MaterialTheme.colorScheme.primary,
@@ -455,7 +582,7 @@ private fun ErrorPage(
 @Composable
 private fun AddressSuggestions(
     query: String,
-    engine: SearchEngine,
+    settings: LumaSettings,
     history: List<HistoryEntry>,
     onSearch: (String) -> Unit,
     onOpen: (String) -> Unit,
@@ -474,8 +601,8 @@ private fun AddressSuggestions(
                 SuggestionRow(
                     icon = Icons.Rounded.Search,
                     title = query,
-                    subtitle = "使用 ${engine.label} 搜索",
-                    onClick = { onSearch(engine.searchUrl(query)) },
+                    subtitle = "使用 ${settings.searchProvider.label} 搜索",
+                    onClick = { onSearch(settings.searchUrl(query)) },
                 )
             }
             history.forEachIndexed { index, entry ->
@@ -541,6 +668,38 @@ private fun SuggestionRow(
                 overflow = TextOverflow.Ellipsis,
             )
         }
+    }
+}
+
+private fun launchInstaller(context: Context, file: File) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+        !context.packageManager.canRequestPackageInstalls()
+    ) {
+        Toast.makeText(context, "请允许 Luma 安装未知应用后重试", Toast.LENGTH_LONG).show()
+        runCatching {
+            context.startActivity(
+                Intent(
+                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:${context.packageName}"),
+                ),
+            )
+        }
+        return
+    }
+    runCatching {
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file,
+        )
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    }.onFailure {
+        Toast.makeText(context, "无法打开安装器：${it.message}", Toast.LENGTH_LONG).show()
     }
 }
 

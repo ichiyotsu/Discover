@@ -1,33 +1,31 @@
 # Luma for Android
 
-Luma 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。
+Luma 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。当前开发版 **0.2.0**。
 
-悬浮地址栏和工具栏一起停靠在页面顶部或底部，设置内实时切换并持久化。网页由系统 Android System WebView 渲染，地址栏、标签页、历史、设置均为原生 Compose。
+网页全屏显示，工具栏作为悬浮层覆盖在网页之上；底栏可随滚动自动收起成只显示网址的小胶囊。
 
-![Luma Android](https://raw.githubusercontent.com/ichiyotsu/Discover/main/docs/android-top.png)
+![Luma Android](../docs/android-top.png)
 
-## 功能
+## 0.2.0 更新
 
-- 悬浮工具栏：前进、后退、刷新 / 停止、地址栏、标签页、菜单。
-- 工具栏顶部 / 底部停靠，切换时页面自动让位。
-- 地址栏：网址识别、搜索、历史记录补全、HTTPS 状态。
-- 键盘避让：底部模式下输入时工具栏浮在键盘上方。
-- 标签页：底部面板切换 / 新建 / 关闭，显示标题、URL、favicon。
-- 历史记录面板：点击打开、清空。
-- 设置：工具栏位置、明暗模式、搜索引擎（Bing / Google / 百度 / DuckDuckGo）、清除历史。
-- 深色模式、系统栏配色、系统返回、外链 Intent、下载、WebView 新窗口。
-- 新标签页：问候、时间、快捷方式、搜索入口。
-- 错误页：主框架加载失败时显示 Compose 错误卡片。
+- **全屏网页 + 悬浮底栏**：网页铺满系统栏之间，底栏悬浮在页面上；底部注入滚动留白，网页最后一行可以滚到栏上方。
+- **滚动自动收起**：向下滚动底栏收成只显示网址的胶囊，向上滚动或点击胶囊展开；设置内可关闭。
+- **二级设置页**：设置改为全屏主列表 + 外观 / 工具栏 / 搜索引擎 / 标签页 / 数据 / 更新 / 关于 二级页面。
+- **自定义搜索引擎**：支持搜索 URL 模板（`{query}` 或 `%s` 占位符）。
+- **应用内更新**：从 GitHub Releases 检查更新，支持正式版 / Beta 通道；启动时自动检查，下载 APK 后调用系统安装器。
+- **全屏标签页**：2 列网格 / 列表可切换，支持网页实时预览缩略图；后台 WebView 保持预加载。
+- **工具栏自定义**：后退、前进、刷新、标签页、翻译可单独开关；地址栏和菜单始终保留。
+- **翻译**：工具栏或菜单可打开 Google 翻译，自动翻译当前页；有选中文本时翻译选中内容。
+- **历史导入导出**：支持 Luma JSON、Chrome / Edge 导出的历史 HTML、Chrome Takeout 的 `BrowserHistory.json`；通过系统文件选择器可直接选择 Google Drive / OneDrive 中的文件。
+- **历史管理**：完整列表、搜索、单条删除、按最近 1 小时 / 今天 / 7 天 / 全部清空，全部需要二次确认。
 
 ## 安装
 
-Release 0.1.0 的 APK：
-
 ```text
-Luma-0.1.0-android.apk
+Luma-0.2.0-android.apk
 ```
 
-要求 Android 12（API 31）或更高。安装包使用调试密钥签名，适合本地安装，不适合上架。
+要求 Android 12（API 31）或更高。APK 使用 debug keystore 签名，适合本地安装，不适合上架。
 
 ## 构建
 
@@ -44,17 +42,10 @@ $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 .\gradlew.bat assembleRelease
 ```
 
-调试包：
-
-```powershell
-.\gradlew.bat assembleDebug
-```
-
 输出：
 
 ```text
 app/build/outputs/apk/release/app-release.apk
-app/build/outputs/apk/debug/app-debug.apk
 ```
 
 ## 结构
@@ -63,30 +54,28 @@ app/build/outputs/apk/debug/app-debug.apk
 app/src/main/java/com/luma/browser/
   MainActivity.kt           Activity、edge-to-edge、主题入口、Intent 处理
   browser/BrowserController.kt
-                            WebView 生命周期、多标签、导航、下载、新窗口
-  data/LumaSettings.kt      SharedPreferences 设置（位置 / 主题 / 搜索引擎）
-  data/HistoryStore.kt      本地历史与补全
-  ui/LumaBrowserScreen.kt   页面卡片、工具栏定位、IME 避让、错误页、补全
-  ui/BrowserChrome.kt       悬浮胶囊：导航、地址栏、菜单
+                            WebView 生命周期、多标签、滚动收起、预览、翻译、下载
+  data/LumaSettings.kt      设置（位置 / 主题 / 搜索 / 更新 / 标签页 / 工具栏）
+  data/HistoryStore.kt      历史记录、Chrome 导入、JSON 导出、范围清理
+  data/UpdateManager.kt     GitHub Releases 检查与 APK 下载
+  ui/LumaBrowserScreen.kt   全屏页面、悬浮栏、补全、错误页、更新对话框
+  ui/BrowserChrome.kt       展开/收起工具栏、导航、菜单、翻译入口
+  ui/SettingsScreen.kt      全屏二级设置页
+  ui/TabSwitcherScreen.kt   全屏标签页 + 网页预览
+  ui/HistoryScreen.kt       全屏历史列表 + 范围清理确认
   ui/NewTabPage.kt          新标签页
-  ui/Sheets.kt              设置 / 标签页 / 历史底部面板
   ui/theme/Theme.kt         Material 3 色彩、形状、字阶
-  ui/Ambient.kt             环境渐变背景
 ```
 
-## 设计说明
+## 同步与插件
 
-桌面版的界面直接运行 md3e Web Components。md3e 是 Web Components，无法在 Compose 里原样使用，因此 Android 端复用它的设计语言而不是代码：
-
-- 胶囊形地址栏 + 悬浮工具栏，和桌面相同的顶部 / 底部停靠逻辑。
-- 26dp 页面大圆角、32dp 工具栏圆角、柔和阴影与半透明表面。
-- 从 `#5B5BD6` 种子色出发的品牌配色，深色模式使用独立 surface 层级。
-- Compose `spring` 动效与桌面端的 0.34 / 1.42 弹簧曲线保持同一气质。
+- **Google Drive / OneDrive 同步**：直接 OAuth 同步需要 Google Cloud OAuth Client 和 Microsoft Graph 应用注册，本版本没有配置这些凭据。当前可通过系统文件选择器把 `Luma-history-*.json` 存到 Drive/OneDrive 文件夹，实现手动跨设备同步。
+- **插件**：Android System WebView 不支持 Chrome 扩展。真正的插件体系需要基于 Chromium fork 或自建 WebView，当前架构无法安全加载 `.crx`。后续可做受限的用户脚本（userscript）注入，但不是 Chrome 插件兼容。
 
 ## 已知限制
 
-- WebView 版本跟随系统；模拟器上的 Chromium 91 较旧，真实设备通常更新。
-- 暂不包含书签管理、Incognito、跨进程标签恢复。
+- WebView 版本跟随系统；模拟器上的 Chromium 91 较旧。
+- 暂无书签管理、Incognito、跨进程标签恢复。
 - 摄像头 / 麦克风等网页权限目前默认拒绝。
-- 不支持扩展、账户同步、自动更新。
-- 发布 APK 使用 debug keystore 签名；上架前需要替换为正式签名。
+- 发布 APK 使用 debug keystore 签名；上架前需要正式签名。
+- 应用内更新下载的是 GitHub Release 中的 APK；若签名不同，系统会拒绝覆盖安装。

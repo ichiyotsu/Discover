@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luma.browser.data.LumaSettings
@@ -73,6 +74,8 @@ fun NewTabPage(
     settings: LumaSettings,
     onOpen: (String) -> Unit,
     onFocusAddress: () -> Unit,
+    topContentPadding: Dp = 0.dp,
+    bottomContentPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
     var now by remember { mutableStateOf(LocalDateTime.now()) }
@@ -144,7 +147,12 @@ fun NewTabPage(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = if (compact) 20.dp else 26.dp, vertical = 22.dp),
+                .padding(
+                    start = if (compact) 20.dp else 26.dp,
+                    end = if (compact) 20.dp else 26.dp,
+                    top = 22.dp + topContentPadding,
+                    bottom = 22.dp + bottomContentPadding,
+                ),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -288,7 +296,7 @@ fun NewTabPage(
                         color = scheme.primary.copy(alpha = 0.11f),
                     ) {
                         Text(
-                            text = settings.engine.label.uppercase(),
+                            text = settings.searchProvider.label.uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             color = scheme.primary,
                             modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
@@ -320,7 +328,7 @@ fun NewTabPage(
             ) {
                 listOf("Material 3 Expressive", "今日科技", "玻璃拟态 CSS").forEach { idea ->
                     Surface(
-                        onClick = { onOpen(settings.engine.searchUrl(idea)) },
+                        onClick = { onOpen(settings.searchUrl(idea)) },
                         shape = RoundedCornerShape(999.dp),
                         color = scheme.surfaceContainerLowest.copy(alpha = 0.40f),
                         border = androidx.compose.foundation.BorderStroke(

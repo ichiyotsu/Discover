@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Tab
+import androidx.compose.material.icons.rounded.Translate
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -59,6 +60,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -86,6 +88,7 @@ fun BrowserChrome(
     onOpenTabs: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenHistory: () -> Unit,
+    onTranslate: () -> Unit,
     onEditingChanged: (Boolean) -> Unit,
     onQueryChanged: (String) -> Unit,
     onSubmit: (String) -> Unit,
@@ -163,7 +166,7 @@ fun BrowserChrome(
                 spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.28f),
             ),
         shape = RoundedCornerShape(32.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.94f),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.97f),
         border = BorderStroke(
             1.dp,
             MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
@@ -177,24 +180,30 @@ fun BrowserChrome(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(1.dp),
         ) {
-            ChromeIconButton(
-                icon = Icons.Rounded.ArrowBack,
-                contentDescription = "后退",
-                enabled = active?.canGoBack == true || active?.isNewTab == false,
-                onClick = { controller.goBack() },
-            )
-            ChromeIconButton(
-                icon = Icons.Rounded.ArrowForward,
-                contentDescription = "前进",
-                enabled = active?.canGoForward == true,
-                onClick = { controller.goForward() },
-            )
-            ChromeIconButton(
-                icon = if (active?.isLoading == true) Icons.Rounded.Close else Icons.Rounded.Refresh,
-                contentDescription = if (active?.isLoading == true) "停止" else "刷新",
-                enabled = active?.isNewTab != true,
-                onClick = { controller.reload() },
-            )
+            if (settings.toolbarBack) {
+                ChromeIconButton(
+                    icon = Icons.Rounded.ArrowBack,
+                    contentDescription = "后退",
+                    enabled = active?.canGoBack == true || active?.isNewTab == false,
+                    onClick = { controller.goBack() },
+                )
+            }
+            if (settings.toolbarForward) {
+                ChromeIconButton(
+                    icon = Icons.Rounded.ArrowForward,
+                    contentDescription = "前进",
+                    enabled = active?.canGoForward == true,
+                    onClick = { controller.goForward() },
+                )
+            }
+            if (settings.toolbarReload) {
+                ChromeIconButton(
+                    icon = if (active?.isLoading == true) Icons.Rounded.Close else Icons.Rounded.Refresh,
+                    contentDescription = if (active?.isLoading == true) "停止" else "刷新",
+                    enabled = active?.isNewTab != true,
+                    onClick = { controller.reload() },
+                )
+            }
 
             Surface(
                 onClick = { onEditingChanged(true) },
@@ -203,7 +212,7 @@ fun BrowserChrome(
                     .weight(1f)
                     .height(48.dp),
                 shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.78f),
+                color = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.92f),
                 border = BorderStroke(
                     1.dp,
                     if (editing) MaterialTheme.colorScheme.primary
@@ -241,7 +250,14 @@ fun BrowserChrome(
                             },
                             modifier = Modifier
                                 .weight(1f)
-                                .focusRequester(addressFocusRequester),
+                                .focusRequester(addressFocusRequester)
+                                .onFocusChanged { focusState ->
+                                    if (focusState.isFocused) {
+                                        fieldValue = fieldValue.copy(
+                                            selection = TextRange(0, fieldValue.text.length),
+                                        )
+                                    }
+                                },
                             singleLine = true,
                             textStyle = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -307,27 +323,37 @@ fun BrowserChrome(
                 }
             }
 
-            Box(contentAlignment = Alignment.Center) {
+            if (settings.toolbarTranslate) {
                 ChromeIconButton(
-                    icon = Icons.Rounded.Tab,
-                    contentDescription = "标签页",
-                    onClick = onOpenTabs,
+                    icon = Icons.Rounded.Translate,
+                    contentDescription = "翻译",
+                    onClick = onTranslate,
                 )
-                if (controller.tabs.size > 1) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(top = 6.dp, end = 4.dp)
-                            .size(16.dp)
-                            .background(MaterialTheme.colorScheme.primary, CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = controller.tabs.size.coerceAtMost(99).toString(),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+            }
+
+            if (settings.toolbarTabs) {
+                Box(contentAlignment = Alignment.Center) {
+                    ChromeIconButton(
+                        icon = Icons.Rounded.Tab,
+                        contentDescription = "标签页",
+                        onClick = onOpenTabs,
+                    )
+                    if (controller.tabs.size > 1) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 6.dp, end = 4.dp)
+                                .size(16.dp)
+                                .background(MaterialTheme.colorScheme.primary, CircleShape),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = controller.tabs.size.coerceAtMost(99).toString(),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
                     }
                 }
             }
@@ -385,6 +411,22 @@ fun BrowserChrome(
                         },
                     )
                     DropdownMenuItem(
+                        text = { Text("标签页") },
+                        leadingIcon = { Icon(Icons.Rounded.Tab, contentDescription = null) },
+                        onClick = {
+                            menuOpen = false
+                            onOpenTabs()
+                        },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("翻译网页 / 选中文本") },
+                        leadingIcon = { Icon(Icons.Rounded.Translate, contentDescription = null) },
+                        onClick = {
+                            menuOpen = false
+                            onTranslate()
+                        },
+                    )
+                    DropdownMenuItem(
                         text = { Text("设置") },
                         leadingIcon = { Icon(Icons.Rounded.Settings, contentDescription = null) },
                         onClick = {
@@ -394,6 +436,61 @@ fun BrowserChrome(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun CollapsedChrome(
+    active: BrowserTab?,
+    onExpand: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val secure = active?.url?.startsWith("https://") == true
+    val display = when {
+        active?.isNewTab == true -> "新标签页"
+        active?.url.isNullOrBlank() -> "搜索或输入网址"
+        else -> active.url
+    }
+    Surface(
+        onClick = onExpand,
+        modifier = modifier.height(48.dp),
+        shape = RoundedCornerShape(24.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.97f),
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.55f),
+        ),
+        shadowElevation = 12.dp,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(9.dp),
+        ) {
+            Icon(
+                imageVector = when {
+                    active?.isNewTab == true -> Icons.Rounded.AutoAwesome
+                    secure -> Icons.Rounded.Lock
+                    else -> Icons.Rounded.Language
+                },
+                contentDescription = null,
+                tint = if (secure) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp),
+            )
+            Text(
+                text = display,
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
         }
     }
 }

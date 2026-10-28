@@ -6,9 +6,11 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.os.Environment
 import android.os.Message
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
@@ -29,6 +31,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.luma.browser.data.HistoryStore
 import com.luma.browser.data.LumaSettings
+import com.luma.browser.data.ToolbarEdge
+import org.json.JSONTokener
 import java.net.URLEncoder
 
 data class PageError(
@@ -50,6 +54,7 @@ class BrowserTab(
     var isNewTab by mutableStateOf(true)
     var favicon by mutableStateOf<Bitmap?>(null)
     var error by mutableStateOf<PageError?>(null)
+    var preview by mutableStateOf<Bitmap?>(null)
 
     val displayUrl: String
         get() = if (isNewTab) "" else url
@@ -66,11 +71,16 @@ class BrowserController(
     var activeTabId by mutableStateOf<Long?>(null)
         private set
 
+    var toolbarCollapsed by mutableStateOf(false)
+        private set
+
     val activeTab: BrowserTab?
         get() = tabs.firstOrNull { it.id == activeTabId }
 
     private var container: FrameLayout? = null
     private var nextId = 1L
+    private var contentTopPx = 0
+    private var contentBottomPx = 0
 
     init {
         newTab()
@@ -100,8 +110,85 @@ class BrowserController(
 
     fun selectTab(id: Long) {
         if (tabs.none { it.id == id }) return
+        if (activeTabId == id) {
+            syncAttachment()
+            return
+        }
+        activeTab?.let { previous ->
+            if (!previous.isNewTab) capturePreview(previous)
+        }
         activeTabId = id
+        toolbarCollapsed = false
         syncAttachment()
+    }
+
+    fun expandToolbar() {
+        toolbarCollapsed = false
+    }
+
+    fun collapseToolbar() {
+        if (settings.edge == ToolbarEdge.BOTTOM && settings.autoCollapseToolbar) {
+            toolbarCollapsed = true
+        }
+    }
+
+    fun setContentInsets(top: Int, bottom: Int) {
+        if (contentTopPx == top && contentBottomPx == bottom) return
+        contentTopPx = top
+        contentBottomPx = bottom
+        tabs.forEach { injectContentInsets(it) }
+    }
+
+    fun capturePreview(tab: BrowserTab) {
+        if (tab.isNewTab || tab.error != null) return
+        val width = tab.webView.width
+        val height = tab.webView.height
+        if (width <= 0 || height <= 0) return
+        runCatching {
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            tab.webView.draw(Canvas(bitmap))
+            val targetWidth = 360
+            val targetHeight = (height.toFloat() / width * targetWidth).toInt().coerceAtLeast(1)
+            tab.preview = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true)
+            if (tab.preview !== bitmap) bitmap.recycle()
+        }
+    }
+
+    fun translateCurrentPage() {
+        val tab = activeTab ?: return
+        if (tab.isNewTab || tab.url.isBlank()) {
+            Toast.makeText(context, "先打开一个网页再翻译", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val encoded = URLEncoder.encode(tab.url, "UTF-8")
+        newTab(
+            "https://translate.google.com/translate?sl=auto&tl=zh-CN&u=$encoded",
+            select = true,
+        )
+    }
+
+    fun translateSelectionOrPage() {
+        val webView = activeTab?.webView
+        if (webView == null || activeTab?.isNewTab == true) {
+            translateCurrentPage()
+            return
+        }
+        webView.evaluateJavascript(
+            "(function(){return window.getSelection ? window.getSelection().toString() : '';})()",
+        ) { raw ->
+            val selected = runCatching {
+                (JSONTokener(raw).nextValue() as? String).orEmpty()
+            }.getOrNull()?.trim().orEmpty()
+            if (selected.isBlank()) {
+                translateCurrentPage()
+            } else {
+                val encoded = URLEncoder.encode(selected, "UTF-8")
+                newTab(
+                    "https://translate.google.com/?sl=auto&tl=zh-CN&text=$encoded&op=translate",
+                    select = true,
+                )
+            }
+        }
     }
 
     fun closeTab(id: Long) {
@@ -151,6 +238,7 @@ class BrowserController(
         tab.title = hostOf(url)
         tab.isLoading = true
         tab.progress = 0.08f
+        toolbarCollapsed = false
         if (activeTabId == tab.id) syncAttachment()
         loadUrl(tab, url)
     }
@@ -166,6 +254,8 @@ class BrowserController(
         tab.error = null
         tab.canGoBack = false
         tab.canGoForward = false
+        tab.preview = null
+        toolbarCollapsed = false
         syncAttachment()
     }
 
@@ -267,7 +357,7 @@ class BrowserController(
         }
         if (LOCALHOST_PATTERN.matches(normalized)) return "http://$normalized"
         if (DOMAIN_PATTERN.matches(normalized)) return "https://$normalized"
-        return settings.engine.searchUrl(normalized)
+        return settings.searchUrl(normalized)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -344,11 +434,21 @@ class BrowserController(
                     if (tab.title.isBlank() || tab.title == "新标签页") {
                         tab.title = hostOf(url)
                     }
-                    if (tab.error == null) {
+                    val lowerTitle = tab.title.lowercase()
+                    val failedPage = tab.error != null ||
+                        lowerTitle.contains("webpage not available") ||
+                        lowerTitle.contains("this site can’t be reached") ||
+                        lowerTitle.contains("this site can't be reached") ||
+                        lowerTitle.contains("无法访问此网站")
+                    if (!failedPage) {
                         history.record(url, tab.title)
                     }
                 }
                 updateNavigation(tab)
+                injectContentInsets(tab)
+                webView.postDelayed({
+                    if (tab.id == activeTabId) capturePreview(tab)
+                }, 420)
             }
 
             override fun onReceivedError(
@@ -451,6 +551,67 @@ class BrowserController(
         webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
             enqueueDownload(url, userAgent, contentDisposition, mimeType)
         }
+
+        val density = context.resources.displayMetrics.density
+        val collapseThreshold = (30 * density).toInt().coerceAtLeast(24)
+        var scrollAccumulator = 0
+        webView.setOnScrollChangeListener { _: View?, _: Int, scrollY: Int, _: Int, oldScrollY: Int ->
+            if (tab.id != activeTabId) return@setOnScrollChangeListener
+            if (!settings.autoCollapseToolbar || settings.edge != ToolbarEdge.BOTTOM) {
+                toolbarCollapsed = false
+                return@setOnScrollChangeListener
+            }
+            val dy = scrollY - oldScrollY
+            if (scrollY <= 0) {
+                toolbarCollapsed = false
+                scrollAccumulator = 0
+                return@setOnScrollChangeListener
+            }
+            if (dy > 0) {
+                scrollAccumulator += dy
+                if (scrollAccumulator > collapseThreshold && scrollY > collapseThreshold * 3) {
+                    toolbarCollapsed = true
+                    scrollAccumulator = 0
+                }
+            } else if (dy < 0) {
+                scrollAccumulator += dy
+                if (scrollAccumulator < -collapseThreshold / 2) {
+                    toolbarCollapsed = false
+                    scrollAccumulator = 0
+                }
+            }
+        }
+    }
+
+    private fun injectContentInsets(tab: BrowserTab) {
+        if (tab.isNewTab) return
+        val top = contentTopPx
+        val bottom = contentBottomPx
+        if (top <= 0 && bottom <= 0) return
+        val script = """
+            (function() {
+              try {
+                if (!document.body) return;
+                var oldTop = document.getElementById('__luma_top_inset');
+                var oldBottom = document.getElementById('__luma_bottom_inset');
+                if (oldTop) oldTop.remove();
+                if (oldBottom) oldBottom.remove();
+                function add(id, height, atStart) {
+                  if (!height || height <= 0) return;
+                  var el = document.createElement('div');
+                  el.id = id;
+                  el.style.cssText = 'display:block!important;width:100%!important;height:' + height + 'px!important;pointer-events:none!important;flex:none!important;';
+                  if (atStart && document.body.firstChild) document.body.insertBefore(el, document.body.firstChild);
+                  else document.body.appendChild(el);
+                }
+                add('__luma_top_inset', $top, true);
+                add('__luma_bottom_inset', $bottom, false);
+                document.documentElement.style.scrollPaddingTop = '${top}px';
+                document.documentElement.style.scrollPaddingBottom = '${bottom}px';
+              } catch (e) {}
+            })();
+        """.trimIndent()
+        tab.webView.evaluateJavascript(script, null)
     }
 
     private fun handleExternalUri(uri: Uri): Boolean {
