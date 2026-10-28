@@ -4,7 +4,7 @@
 
 界面基于非官方 Material 3 Expressive Web Components 库 [`@materialwebunofficial/md3e-web`](https://materialwebunofficial.github.io/#home)，动态色、形状和弹簧动效全部来自 md3e tokens。
 
-[![Latest release](https://img.shields.io/badge/release-0.1.0--beta1-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta1)
+[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.1-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.1)
 
 | 桌面端 | Android |
 | --- | --- |
@@ -12,15 +12,15 @@
 
 ## 下载
 
-Release **0.1.0 Beta 1**：
+Release **0.1.0-beta.1**：
 
-- **Android**：`Luma-0.1.0-beta1-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、滚动收起、二级设置、标签页预览、更新与历史管理均已包含。
+- **Android**：`Luma-0.1.0-beta.1-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、滚动收起、二级设置、标签页预览、更新与历史管理均已包含。
 - **Windows x64**：源码随仓库发布；运行 `pnpm install && pnpm package` 生成便携包。218MB 的便携包本次未随 Release 上传。
 - **源码**：GitHub 自动生成 Source code zip。
 
-前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta1) 下载。
+前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.1) 下载。
 
-> 0.1.0 Beta 1 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
+> 0.1.0-beta.1 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
 
 ## 截图
 

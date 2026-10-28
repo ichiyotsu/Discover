@@ -1,12 +1,12 @@
 # Luma for Android
 
-Luma 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。当前测试版 **0.1.0 Beta 1**。
+Luma 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。当前测试版 **0.1.0-beta.1**。
 
 网页全屏显示，工具栏作为悬浮层覆盖在网页之上；底栏可随滚动自动收起成只显示网址的小胶囊。
 
 ![Luma Android](../docs/android-top.png)
 
-## 0.1.0 Beta 1 更新
+## 0.1.0-beta.1 更新
 
 - **全屏网页 + 悬浮底栏**：网页铺满系统栏之间，底栏悬浮在页面上；底部注入滚动留白，网页最后一行可以滚到栏上方。
 - **滚动自动收起**：向下滚动底栏收成只显示网址的胶囊，向上滚动或点击胶囊展开；设置内可关闭。
@@ -23,7 +23,7 @@ Luma 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium�
 ## 安装
 
 ```text
-Luma-0.1.0-beta1-android.apk
+Luma-0.1.0-beta.1-android.apk
 ```
 
 要求 Android 12（API 31）或更高。APK 使用 debug keystore 签名，适合本地安装，不适合上架。
