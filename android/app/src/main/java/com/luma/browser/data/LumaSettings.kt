@@ -81,6 +81,9 @@ class LumaSettings(context: Context) {
     var tabPreviews by mutableStateOf(prefs.getBoolean(KEY_TAB_PREVIEWS, true))
         private set
 
+    var backgroundUri by mutableStateOf(prefs.getString(KEY_BACKGROUND_URI, null))
+        private set
+
     var updateChannel by mutableStateOf(
         if (prefs.getString(KEY_UPDATE_CHANNEL, null) == "beta") UpdateChannel.BETA else UpdateChannel.STABLE,
     )
@@ -180,6 +183,13 @@ class LumaSettings(context: Context) {
         prefs.edit().putBoolean(KEY_TAB_PREVIEWS, value).apply()
     }
 
+    fun updateBackgroundUri(value: String?) {
+        backgroundUri = value
+        prefs.edit().apply {
+            if (value.isNullOrBlank()) remove(KEY_BACKGROUND_URI) else putString(KEY_BACKGROUND_URI, value)
+        }.apply()
+    }
+
     fun updateUpdateChannel(value: UpdateChannel) {
         updateChannel = value
         prefs.edit().putString(KEY_UPDATE_CHANNEL, if (value == UpdateChannel.BETA) "beta" else "stable").apply()
@@ -224,6 +234,7 @@ class LumaSettings(context: Context) {
         const val KEY_AUTO_COLLAPSE = "auto_collapse_toolbar"
         const val KEY_TAB_LAYOUT = "tab_layout"
         const val KEY_TAB_PREVIEWS = "tab_previews"
+        const val KEY_BACKGROUND_URI = "background_uri"
         const val KEY_UPDATE_CHANNEL = "update_channel"
         const val KEY_AUTO_CHECK_UPDATES = "auto_check_updates"
         const val KEY_TOOLBAR_BACK = "toolbar_back"

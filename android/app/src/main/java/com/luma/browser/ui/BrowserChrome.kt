@@ -66,6 +66,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -74,6 +75,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luma.browser.R
 import com.luma.browser.browser.BrowserController
 import com.luma.browser.browser.BrowserTab
 import com.luma.browser.data.LumaSettings
@@ -151,7 +153,7 @@ fun BrowserChrome(
         val url = active?.url.orEmpty()
         if (url.isBlank() || active?.isNewTab == true) return
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("Luma URL", url))
+        clipboard.setPrimaryClip(ClipData.newPlainText("Luna URL", url))
         Toast.makeText(context, "网址已复制", Toast.LENGTH_SHORT).show()
     }
 
@@ -227,18 +229,22 @@ fun BrowserChrome(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     val secure = active?.url?.startsWith("https://") == true
-                    val icon = when {
-                        active?.isNewTab == true -> Icons.Rounded.AutoAwesome
-                        secure -> Icons.Rounded.Lock
-                        else -> Icons.Rounded.Language
+                    if (active?.isNewTab == true) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_luna_mark),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(17.dp),
+                        )
+                    } else {
+                        Icon(
+                            imageVector = if (secure) Icons.Rounded.Lock else Icons.Rounded.Language,
+                            contentDescription = null,
+                            tint = if (secure) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
+                        )
                     }
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = if (secure) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp),
-                    )
                     Spacer(Modifier.width(7.dp))
 
                     if (editing) {

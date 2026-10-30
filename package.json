@@ -1,10 +1,10 @@
 {
   "name": "luma-browser",
-  "productName": "Luma",
+  "productName": "Luna",
   "version": "0.1.0",
-  "description": "Luma — a Material 3 Expressive browser built on the Chromium engine with md3e.",
+  "description": "Luna — a Material 3 Expressive browser built on the Chromium engine with md3e.",
   "main": "src/main/main.js",
-  "author": "Luma",
+  "author": "Luna",
   "license": "Apache-2.0",
   "private": true,
   "scripts": {

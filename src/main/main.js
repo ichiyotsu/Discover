@@ -20,7 +20,7 @@ const RENDERER_DIR = path.join(ROOT, 'src', 'renderer');
 const PRELOAD = path.join(__dirname, 'preload.js');
 const IS_DEV = process.argv.includes('--dev');
 
-app.setName('Luma');
+app.setName('Luna');
 app.setAppUserModelId('app.luma.browser');
 Menu.setApplicationMenu(null);
 
@@ -458,7 +458,7 @@ function createWindow() {
     show: false,
     frame: false,
     backgroundColor: '#141218',
-    title: 'Luma',
+    title: 'Luna',
     roundedCorners: true,
     hasShadow: true,
     icon: path.join(ROOT, 'assets', 'icon.png'),

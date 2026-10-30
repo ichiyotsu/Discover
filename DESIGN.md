@@ -1,11 +1,11 @@
-# Luma 设计说明
+# Luna 设计说明
 
 > 视觉与交互参考：[Material Design 3 Expressive — Built for the Web](https://materialwebunofficial.github.io/#home)  
 > 官方实现：`@materialwebunofficial/md3e-web` 1.0.14（非 Google 官方项目，Apache-2.0）
 
 ## 1. 设计意图
 
-Luma 把浏览器界面分成三个层次：
+Luna 把浏览器界面分成三个层次：
 
 1. **环境层**：窗口边缘的柔和渐变与缓慢漂移的色块，暗示“这是一个容器”，而不是一张白纸。
 2. **悬浮层**：地址栏 + 导航按钮 + 菜单组成一只玻璃胶囊，和标签栏一起停靠在顶部或底部。
@@ -15,7 +15,7 @@ Luma 把浏览器界面分成三个层次：
 
 ## 2. 从 md3e 继承了什么
 
-| md3e 能力 | Luma 的使用方式 |
+| md3e 能力 | Luna 的使用方式 |
 | --- | --- |
 | Design tokens | `tokens.css` 提供基础色、形状、字阶、状态层、动效曲线 |
 | 动态色（HCT） | `applyDynamicTheme(seed, dark, 'expressive')` 从 8 个种子色生成整套角色 |

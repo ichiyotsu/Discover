@@ -177,7 +177,7 @@ fun SettingsScreen(
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = "Luma ${BuildConfig.VERSION_NAME}",
+                    text = "Luna ${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(end = 12.dp),
@@ -199,7 +199,7 @@ fun SettingsScreen(
                 SettingsPage.DATA -> DataPage(
                     history = history,
                     message = dataMessage,
-                    onExport = { exportLauncher.launch("Luma-history-${fileDate()}.json") },
+                    onExport = { exportLauncher.launch("Luna-history-${fileDate()}.json") },
                     onImport = {
                         importLauncher.launch(
                             arrayOf("text/html", "application/json", "text/plain", "application/octet-stream"),
@@ -302,7 +302,7 @@ private fun SettingsRoot(
         SettingsEntry(
             icon = Icons.Rounded.Info,
             title = "关于",
-            summary = "Luma ${BuildConfig.VERSION_NAME}",
+            summary = "Luna ${BuildConfig.VERSION_NAME}",
             page = SettingsPage.ABOUT,
         ),
     )
@@ -389,6 +389,18 @@ private data class SettingsEntry(
 
 @Composable
 private fun AppearancePage(settings: LumaSettings) {
+    val context = LocalContext.current
+    val backgroundLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
+            }
+            settings.updateBackgroundUri(uri.toString())
+        }
+    }
     SettingsPageContent {
         SettingsLabel("明暗模式", "界面和系统栏会立即切换。")
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -407,8 +419,37 @@ private fun AppearancePage(settings: LumaSettings) {
             }
         }
         Spacer(Modifier.height(24.dp))
+        SettingsLabel("主页背景", "默认沿用当前渐变，也可以从相册选择一张图片。")
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Button(
+                onClick = { backgroundLauncher.launch(arrayOf("image/*")) },
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(if (settings.backgroundUri == null) "选择图片" else "更换图片")
+            }
+            if (settings.backgroundUri != null) {
+                TextButton(
+                    onClick = {
+                        settings.backgroundUri?.let { uri ->
+                            runCatching {
+                                context.contentResolver.releasePersistableUriPermission(
+                                    Uri.parse(uri),
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                                )
+                            }
+                        }
+                        settings.updateBackgroundUri(null)
+                    },
+                ) { Text("恢复默认") }
+            }
+        }
+        Spacer(Modifier.height(24.dp))
         Text(
-            text = "Android 端使用 Compose 复刻 md3e 的动态色、层级和形状；桌面端的 md3e 主题色种子暂未在手机端开放。",
+            text = "全局排版使用 Google Sans Flex，圆角、层级和玻璃质感参照 TokiUI；桌面端的主题色种子暂未在手机端开放。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -575,7 +616,7 @@ private fun DataPage(
         }
         Spacer(Modifier.height(10.dp))
         Text(
-            text = "支持 Luma JSON、Chrome / Edge 导出的历史记录 HTML，以及 Chrome Takeout 的 BrowserHistory.json。Google Drive / OneDrive 可通过系统文件选择器直接导入导出。",
+            text = "支持 Luna JSON、Chrome / Edge 导出的历史记录 HTML，以及 Chrome Takeout 的 BrowserHistory.json。Google Drive / OneDrive 可通过系统文件选择器直接导入导出。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -704,7 +745,7 @@ private fun AboutPage() {
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                Text("Luma", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Text("Luna", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                 Text(
                     text = "Material 3 Expressive 浏览器 · ${BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.bodySmall,
@@ -716,9 +757,10 @@ private fun AboutPage() {
         SettingsInfoRow("浏览器内核", "Chromium WebView $webViewVersion")
         SettingsInfoRow("界面", "Jetpack Compose · Material 3")
         SettingsInfoRow("设计参考", "md3e · Material 3 Expressive")
+        SettingsInfoRow("图标", "Streamline · ai-edit-spark-solid")
         Spacer(Modifier.height(16.dp))
         Text(
-            text = "Luma 是独立项目，与 Google 无关。网页由 Android System WebView 渲染。",
+            text = "Luna 是独立项目，与 Google 无关。网页由 Android System WebView 渲染。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

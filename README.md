@@ -1,36 +1,36 @@
-# Luma
+# Luna
 
-**Luma** 是一个把地址栏做成悬浮玻璃胶囊的浏览器。地址栏与工具栏一起停靠在窗口顶部或底部，可在设置里实时切换；网页内容装在一张圆角卡片里，随工具栏自动让位。
+**Luna** 是一个把地址栏做成悬浮玻璃胶囊的浏览器。地址栏与工具栏一起停靠在窗口顶部或底部，可在设置里实时切换；网页内容装在一张圆角卡片里，随工具栏自动让位。
 
 界面基于非官方 Material 3 Expressive Web Components 库 [`@materialwebunofficial/md3e-web`](https://materialwebunofficial.github.io/#home)，动态色、形状和弹簧动效全部来自 md3e tokens。
 
-[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.1-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.1)
+[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.2-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.2)
 
 | 桌面端 | Android |
 | --- | --- |
-| ![Luma 桌面新标签页](docs/luma-newtab.png) | ![Luma Android 新标签页](docs/android-top.png) |
+| ![Luna 桌面新标签页](docs/luma-newtab.png) | ![Luna Android 新标签页](docs/android-top.png) |
 
 ## 下载
 
-Release **0.1.0-beta.1**：
+Release **0.1.0-beta.2**：
 
-- **Android**：`Luma-0.1.0-beta.1-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、滚动收起、二级设置、标签页预览、更新与历史管理均已包含。
+- **Android**：`Luna-0.1.0-beta.2-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、横向滑动收起、磨砂状态栏、简约主页与自定义背景、Google Sans Flex、二级设置、标签页预览、更新与历史管理均已包含。
 - **Windows x64**：源码随仓库发布；运行 `pnpm install && pnpm package` 生成便携包。218MB 的便携包本次未随 Release 上传。
 - **源码**：GitHub 自动生成 Source code zip。
 
-前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.1) 下载。
+前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.2) 下载。
 
-> 0.1.0-beta.1 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
+> 0.1.0-beta.2 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
 
 ## 截图
 
 | 桌面设置 | 桌面 · 底部工具栏 · 深色 |
 | --- | --- |
-| ![Luma 设置](docs/luma-settings.png) | ![Luma 深色底部](docs/luma-bottom-dark.png) |
+| ![Luna 设置](docs/luma-settings.png) | ![Luna 深色底部](docs/luma-bottom-dark.png) |
 
 | Android 浏览器 | Android · 深色 |
 | --- | --- |
-| ![Luma Android 页面](docs/android-browsing.png) | ![Luma Android 深色](docs/android-dark.png) |
+| ![Luna Android 页面](docs/android-browsing.png) | ![Luna Android 深色](docs/android-dark.png) |
 
 ## 桌面端
 
@@ -69,7 +69,7 @@ pnpm dev
 pnpm package
 ```
 
-产物在 `dist/Luma-win32-x64`。
+产物在 `dist/Luna-win32-x64`。
 
 ### 快捷键
 
@@ -127,7 +127,7 @@ docs/                     截图
 
 ```powershell
 pnpm test:flow       # 真实加载、标签、书签、补全、错误页、主题、工具栏位置
-pnpm test:packaged   # 启动打包后的 Luma.exe，验证 asar 内的本地页面
+pnpm test:packaged   # 启动打包后的 Luna.exe，验证 asar 内的本地页面
 ```
 
 Android 端在 Android 12（API 31）模拟器上验证过启动、导航、顶部/底部切换、标签页和键盘避让。
@@ -143,4 +143,4 @@ Android 端在 Android 12（API 31）模拟器上验证过启动、导航、顶�
 
 ## 许可
 
-Luma 源代码采用 Apache License 2.0。md3e 是独立开源项目，同样使用 Apache License 2.0，详见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+Luna 源代码采用 Apache License 2.0。md3e 是独立开源项目，同样使用 Apache License 2.0，详见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。

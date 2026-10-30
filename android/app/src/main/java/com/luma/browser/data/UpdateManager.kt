@@ -28,7 +28,7 @@ class UpdateManager {
                     readTimeout = 20_000
                     requestMethod = "GET"
                     setRequestProperty("Accept", "application/vnd.github+json")
-                    setRequestProperty("User-Agent", "Luma-Android/${BuildConfig.VERSION_NAME}")
+                    setRequestProperty("User-Agent", "Luna-Android/${BuildConfig.VERSION_NAME}")
                 }
                 try {
                     if (connection.responseCode != 200) return@runCatching null
@@ -56,7 +56,7 @@ class UpdateManager {
                         val candidate = UpdateInfo(
                             version = version,
                             tag = tag,
-                            title = item.optString("name").ifBlank { "Luma $version" },
+                            title = item.optString("name").ifBlank { "Luna $version" },
                             notes = item.optString("body"),
                             pageUrl = item.optString("html_url"),
                             apkUrl = apkUrl,
@@ -84,7 +84,7 @@ class UpdateManager {
             readTimeout = 60_000
             instanceFollowRedirects = true
             setRequestProperty("Accept", "application/octet-stream")
-            setRequestProperty("User-Agent", "Luma-Android/${BuildConfig.VERSION_NAME}")
+            setRequestProperty("User-Agent", "Luna-Android/${BuildConfig.VERSION_NAME}")
         }
         try {
             if (connection.responseCode !in 200..299) {

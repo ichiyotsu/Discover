@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const packageDir = path.join(root, 'dist', 'Luma-win32-x64');
+const packageDir = path.join(root, 'dist', 'Luna-win32-x64');
 const artifacts = path.join(root, 'tests', 'artifacts');
 await mkdir(artifacts, { recursive: true });
 
@@ -13,7 +13,7 @@ const env = Object.fromEntries(
 );
 
 const app = await electron.launch({
-  executablePath: path.join(packageDir, 'Luma.exe'),
+  executablePath: path.join(packageDir, 'Luna.exe'),
   args: [],
   cwd: packageDir,
   env,

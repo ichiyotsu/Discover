@@ -218,8 +218,13 @@ class BrowserController(
         val input = raw.trim()
         if (input.isEmpty()) return
 
-        if (input.startsWith("luma://", ignoreCase = true)) {
-            val command = input.removePrefix("luma://").trim('/').lowercase()
+        val scheme = when {
+            input.startsWith("luna://", ignoreCase = true) -> "luna://"
+            input.startsWith("luma://", ignoreCase = true) -> "luma://"
+            else -> null
+        }
+        if (scheme != null) {
+            val command = input.removePrefix(scheme).trim('/').lowercase()
             if (command.startsWith("settings") || command.startsWith("history") || command.startsWith("newtab")) {
                 onInternalCommand(command.substringBefore('/'))
                 return

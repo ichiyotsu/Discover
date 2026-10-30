@@ -6,7 +6,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const output = await packager({
   dir: root,
-  name: 'Luma',
+  name: 'Luna',
   platform: 'win32',
   arch: 'x64',
   out: path.join(root, 'dist'),
@@ -15,13 +15,13 @@ const output = await packager({
   prune: true,
   icon: path.join(root, 'assets', 'icon.ico'),
   appVersion: '0.1.0',
-  appCopyright: 'Luma',
+  appCopyright: 'Luna',
   win32metadata: {
-    CompanyName: 'Luma',
-    FileDescription: 'Luma — a Material 3 Expressive browser',
-    ProductName: 'Luma',
-    InternalName: 'Luma',
-    OriginalFilename: 'Luma.exe',
+    CompanyName: 'Luna',
+    FileDescription: 'Luna — a Material 3 Expressive browser',
+    ProductName: 'Luna',
+    InternalName: 'Luna',
+    OriginalFilename: 'Luna.exe',
   },
   ignore: [
     /^\/node_modules($|\/)/,

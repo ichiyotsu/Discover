@@ -10,7 +10,7 @@
 
 ## 安装包
 
-- Android：`Luma-<版本号>-android.apk`
+- Android：`Luna-<版本号>-android.apk`
 - 桌面端保留平台后缀
 
 ## Release Notes

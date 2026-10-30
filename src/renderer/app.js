@@ -282,7 +282,7 @@ function createTab({ url = newTabUrl(), active = true, focusAddress = false } = 
 
   const favicon = document.createElement('span');
   favicon.className = 'tab-favicon';
-  favicon.appendChild(makeFavicon(null, 'Luma', isNewTabUrl(url)));
+  favicon.appendChild(makeFavicon(null, 'Luna', isNewTabUrl(url)));
 
   const title = document.createElement('span');
   title.className = 'tab-title';
@@ -625,13 +625,13 @@ function attachWebviewEvents(tab) {
 
   webview.addEventListener('page-title-updated', (event) => {
     if (isInternalUrl(tab.url) || isInternalUrl(getWebviewUrl(tab))) {
-      tab.title = isNewTabUrl(tab.url) ? '新标签页' : 'Luma';
+      tab.title = isNewTabUrl(tab.url) ? '新标签页' : 'Luna';
     } else {
       tab.title = event.title?.trim() || defaultTitle(tab.url);
     }
     updateTabElement(tab);
     if (state.activeId === tab.id) {
-      document.title = `${tab.title} — Luma`;
+      document.title = `${tab.title} — Luna`;
       updateHistoryTitle(tab.url, tab.title);
     }
   });
@@ -729,7 +729,7 @@ function updateToolbar() {
   elements.star.title = bookmarked ? '移除此书签' : '添加书签';
   elements.star.disabled = isNewTabUrl(tab.url) || isInternalUrl(tab.url);
 
-  document.title = `${tab.title || defaultTitle(tab.url)} — Luma`;
+  document.title = `${tab.title || defaultTitle(tab.url)} — Luna`;
 }
 
 function renderUrlDisplay(tab) {
@@ -749,7 +749,7 @@ function renderUrlDisplay(tab) {
   if (isInternalUrl(tab.url)) {
     const internal = document.createElement('span');
     internal.className = 'url-internal';
-    internal.innerHTML = `${svgIcon('shield')}<span>Luma 内部页面</span>`;
+    internal.innerHTML = `${svgIcon('shield')}<span>Luna 内部页面</span>`;
     container.appendChild(internal);
     elements.siteChip.classList.add('secure');
     setSiteIcon('shield');
@@ -1055,7 +1055,7 @@ function navigateTo(rawInput) {
     else if (command === 'history') openPanel('history');
     else if (command === 'bookmarks') openPanel('bookmarks');
     else if (command === 'newtab') loadTabUrl(tab, newTabUrl());
-    else showToast('没有这个 Luma 内部页面。', { icon: 'info' });
+    else showToast('没有这个 Luna 内部页面。', { icon: 'info' });
     return;
   }
 
@@ -1129,8 +1129,8 @@ function errorDescription(code, description = '') {
     '-118': '网站响应时间过长。你的网络可能较慢，或网站暂时不可用。',
     '-7': '网站响应时间过长。请稍后重试。',
     '-21': '网络连接在加载过程中被中断。',
-    '-201': '这个网站的证书不受信任。为了安全，Luma 没有继续加载它。',
-    '-202': '无法确认这个网站的身份。为了安全，Luma 没有继续加载它。',
+    '-201': '这个网站的证书不受信任。为了安全，Luna 没有继续加载它。',
+    '-202': '无法确认这个网站的身份。为了安全，Luna 没有继续加载它。',
     '-300': '页面重定向次数过多，可能需要清除此网站的 Cookie。',
   };
   return map[String(code)] || (description ? `错误详情：${description}` : '页面暂时无法加载，请稍后重试。');
@@ -1425,7 +1425,7 @@ function toggleSitePopover() {
 
   const isNewTab = isNewTabUrl(tab.url);
   const isSecure = !isNewTab && /^https:/i.test(tab.url);
-  const origin = isNewTab ? '由 Luma 本地生成' : (() => {
+  const origin = isNewTab ? '由 Luna 本地生成' : (() => {
     try {
       return new URL(tab.url).origin;
     } catch {
@@ -1434,7 +1434,7 @@ function toggleSitePopover() {
   })();
 
   elements.sitePopoverTitle.textContent = isNewTab
-    ? 'Luma 新标签页'
+    ? 'Luna 新标签页'
     : isSecure
       ? '连接安全'
       : '连接不安全';

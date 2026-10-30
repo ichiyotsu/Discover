@@ -156,7 +156,7 @@ function updateClock() {
     greeting.textContent = `${greetingText}。`;
     greetingLine.textContent = greetingText;
   }
-  document.title = '新标签页 · Luma';
+  document.title = '新标签页 · Luna';
 }
 
 window.__lumaApplySettings = (next = {}) => {

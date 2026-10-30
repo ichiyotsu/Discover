@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.luma.browser.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,11 +10,47 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luma.browser.R
+
+/**
+ * Google Sans Flex, following the TokiUI type ramp. The variable font is
+ * registered once and weights are driven through the variation axis.
+ */
+val GoogleSansFlex = FontFamily(
+    Font(
+        resId = R.font.google_sans_flex,
+        weight = FontWeight.Normal,
+        style = FontStyle.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(400)),
+    ),
+    Font(
+        resId = R.font.google_sans_flex,
+        weight = FontWeight.Medium,
+        style = FontStyle.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(500)),
+    ),
+    Font(
+        resId = R.font.google_sans_flex,
+        weight = FontWeight.SemiBold,
+        style = FontStyle.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(600)),
+    ),
+    Font(
+        resId = R.font.google_sans_flex,
+        weight = FontWeight.Bold,
+        style = FontStyle.Normal,
+        variationSettings = FontVariation.Settings(FontVariation.weight(700)),
+    ),
+)
 
 private val LumaLightColors = lightColorScheme(
     primary = Color(0xFF5B5BD6),
@@ -88,79 +126,143 @@ private val LumaDarkColors = darkColorScheme(
     inversePrimary = Color(0xFF5B5BD6),
 )
 
+/** TokiUI expressive corner scale. */
 private val LumaShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(14.dp),
-    medium = RoundedCornerShape(20.dp),
-    large = RoundedCornerShape(28.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(26.dp),
     extraLarge = RoundedCornerShape(36.dp),
 )
 
-private val LumaTypography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 54.sp,
-        lineHeight = 58.sp,
-        letterSpacing = (-1.6).sp,
-    ),
-    displayMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 44.sp,
-        lineHeight = 48.sp,
-        letterSpacing = (-1.2).sp,
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 32.sp,
-        lineHeight = 38.sp,
-        letterSpacing = (-0.6).sp,
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 26.sp,
-        lineHeight = 32.sp,
-        letterSpacing = (-0.4).sp,
-    ),
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 26.sp,
-        letterSpacing = (-0.2).sp,
-    ),
-    titleMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 22.sp,
-        letterSpacing = 0.sp,
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.1.sp,
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 13.sp,
-        lineHeight = 18.sp,
-        letterSpacing = 0.1.sp,
-    ),
+private fun Typography.withFont(family: FontFamily): Typography = copy(
+    displayLarge = displayLarge.copy(fontFamily = family),
+    displayMedium = displayMedium.copy(fontFamily = family),
+    displaySmall = displaySmall.copy(fontFamily = family),
+    headlineLarge = headlineLarge.copy(fontFamily = family),
+    headlineMedium = headlineMedium.copy(fontFamily = family),
+    headlineSmall = headlineSmall.copy(fontFamily = family),
+    titleLarge = titleLarge.copy(fontFamily = family),
+    titleMedium = titleMedium.copy(fontFamily = family),
+    titleSmall = titleSmall.copy(fontFamily = family),
+    bodyLarge = bodyLarge.copy(fontFamily = family),
+    bodyMedium = bodyMedium.copy(fontFamily = family),
+    bodySmall = bodySmall.copy(fontFamily = family),
+    labelLarge = labelLarge.copy(fontFamily = family),
+    labelMedium = labelMedium.copy(fontFamily = family),
+    labelSmall = labelSmall.copy(fontFamily = family),
 )
+
+/** Global type ramp: every Material role uses Google Sans Flex. */
+private val LumaTypography: Typography = Typography()
+    .withFont(GoogleSansFlex)
+    .copy(
+        displayLarge = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 56.sp,
+            lineHeight = 62.sp,
+            letterSpacing = (-1.5).sp,
+        ),
+        displayMedium = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 46.sp,
+            lineHeight = 52.sp,
+            letterSpacing = (-1.2).sp,
+        ),
+        displaySmall = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Medium,
+            fontSize = 38.sp,
+            lineHeight = 44.sp,
+            letterSpacing = (-0.8).sp,
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 32.sp,
+            lineHeight = 38.sp,
+            letterSpacing = (-0.4).sp,
+        ),
+        headlineMedium = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 28.sp,
+            lineHeight = 34.sp,
+            letterSpacing = (-0.3).sp,
+        ),
+        headlineSmall = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Medium,
+            fontSize = 24.sp,
+            lineHeight = 30.sp,
+            letterSpacing = (-0.2).sp,
+        ),
+        titleLarge = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Medium,
+            fontSize = 22.sp,
+            lineHeight = 28.sp,
+            letterSpacing = (-0.2).sp,
+        ),
+        titleMedium = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 17.sp,
+            lineHeight = 23.sp,
+            letterSpacing = 0.sp,
+        ),
+        titleSmall = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 15.sp,
+            lineHeight = 21.sp,
+            letterSpacing = 0.sp,
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp,
+            lineHeight = 26.sp,
+            letterSpacing = 0.1.sp,
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp,
+            lineHeight = 21.sp,
+            letterSpacing = 0.1.sp,
+        ),
+        bodySmall = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp,
+            lineHeight = 17.sp,
+            letterSpacing = 0.1.sp,
+        ),
+        labelLarge = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            lineHeight = 20.sp,
+            letterSpacing = 0.1.sp,
+        ),
+        labelMedium = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
+            lineHeight = 17.sp,
+            letterSpacing = 0.1.sp,
+        ),
+        labelSmall = TextStyle(
+            fontFamily = GoogleSansFlex,
+            fontWeight = FontWeight.Medium,
+            fontSize = 11.sp,
+            lineHeight = 15.sp,
+            letterSpacing = 0.2.sp,
+        ),
+    )
 
 @Composable
 fun LumaTheme(
