@@ -4,7 +4,7 @@
 
 界面基于非官方 Material 3 Expressive Web Components 库 [`@materialwebunofficial/md3e-web`](https://materialwebunofficial.github.io/#home)，动态色、形状和弹簧动效全部来自 md3e tokens。
 
-[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.2-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.2)
+[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.3-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.3)
 
 | 桌面端 | Android |
 | --- | --- |
@@ -12,15 +12,15 @@
 
 ## 下载
 
-Release **0.1.0-beta.2**：
+Release **0.1.0-beta.3**：
 
-- **Android**：`Luna-0.1.0-beta.2-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、横向滑动收起、磨砂状态栏、简约主页与自定义背景、Google Sans Flex、二级设置、标签页预览、更新与历史管理均已包含。
+- **Android**：`Luna-0.1.0-beta.3-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、横向滑动收起、磨砂状态栏、简约主页与自定义背景、Google Sans Flex（含网页字体）、二级设置、标签页预览、更新与历史管理均已包含。
 - **Windows x64**：源码随仓库发布；运行 `pnpm install && pnpm package` 生成便携包。218MB 的便携包本次未随 Release 上传。
 - **源码**：GitHub 自动生成 Source code zip。
 
-前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.2) 下载。
+前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.3) 下载。
 
-> 0.1.0-beta.2 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
+> 0.1.0-beta.3 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
 
 ## 截图
 

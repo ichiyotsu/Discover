@@ -1,13 +1,14 @@
 # Luna for Android
 
-Luna 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。当前测试版 **0.1.0-beta.2**。
+Luna 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium）**。当前测试版 **0.1.0-beta.3**。
 
 网页全屏显示，工具栏作为悬浮层覆盖在网页之上；状态栏使用磨砂玻璃遮罩，底栏可随滚动或横向滑动收起。
 
 ![Luna Android](../docs/android-top.png)
 
-## 0.1.0-beta.2 更新
+## 0.1.0-beta.3 更新
 
+- **网页字体统一**：通过 WebView 拦截本地字体文件并注入 `@font-face` 与全局 CSS，网页正文、表单、按钮默认都使用 Google Sans Flex；保留常见图标字体选择器，避免 Material Icons / FontAwesome 失效。
 - **品牌更名 Luna**：Android 应用名、界面文案、新标签页与关于页统一为 Luna；`applicationId` 仍保留 `com.luma.browser`，确保可以直接覆盖升级。
 - **全新应用图标**：基于 Streamline `ai-edit-spark-solid`，108dp adaptive icon + 紫靛渐变背景 + monochrome，图形大小按 TokiNote 的安全区规范重制。来源见 [`docs/icon-sources.md`](../docs/icon-sources.md)。
 - **简约主页与自定义背景**：默认主页只保留 Luna 字标和一个搜索框，继续使用当前渐变；外观页可从相册选择背景图片，或恢复默认。
@@ -28,7 +29,7 @@ Luna 的原生 Android 版本：**Jetpack Compose + Android WebView（Chromium�
 ## 安装
 
 ```text
-Luna-0.1.0-beta.2-android.apk
+Luna-0.1.0-beta.3-android.apk
 ```
 
 要求 Android 12（API 31）或更高。APK 使用 debug keystore 签名，适合本地安装，不适合上架。

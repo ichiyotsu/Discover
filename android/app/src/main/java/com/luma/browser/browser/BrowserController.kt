@@ -20,6 +20,7 @@ import android.webkit.URLUtil
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.luma.browser.R
 import com.luma.browser.data.HistoryStore
 import com.luma.browser.data.LumaSettings
 import com.luma.browser.data.ToolbarEdge
@@ -415,6 +417,32 @@ class BrowserController(
                 return handleExternalUri(uri)
             }
 
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                request: WebResourceRequest?,
+            ): WebResourceResponse? {
+                val requestUrl = request?.url?.toString() ?: return null
+                if (requestUrl != FONT_URL) return null
+                return runCatching {
+                    WebResourceResponse(
+                        "font/ttf",
+                        "UTF-8",
+                        200,
+                        "OK",
+                        mapOf(
+                            "Access-Control-Allow-Origin" to "*",
+                            "Cache-Control" to "public, max-age=31536000",
+                        ),
+                        context.resources.openRawResource(R.font.google_sans_flex),
+                    )
+                }.getOrNull()
+            }
+
+            override fun onPageCommitVisible(view: WebView?, url: String?) {
+                super.onPageCommitVisible(view, url)
+                injectFontOverride(tab)
+            }
+
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
                 tab.error = null
@@ -451,6 +479,7 @@ class BrowserController(
                 }
                 updateNavigation(tab)
                 injectContentInsets(tab)
+                injectFontOverride(tab)
                 webView.postDelayed({
                     if (tab.id == activeTabId) capturePreview(tab)
                 }, 420)
@@ -588,6 +617,11 @@ class BrowserController(
         }
     }
 
+    private fun injectFontOverride(tab: BrowserTab) {
+        if (tab.isNewTab) return
+        tab.webView.evaluateJavascript(FONT_SCRIPT, null)
+    }
+
     private fun injectContentInsets(tab: BrowserTab) {
         if (tab.isNewTab) return
         val top = contentTopPx
@@ -680,6 +714,34 @@ class BrowserController(
     }
 
     private companion object {
+        const val FONT_URL = "https://luna.invalid/fonts/google_sans_flex.ttf"
+
+        val FONT_SCRIPT = """
+            (function() {
+              try {
+                if (document.getElementById('luna-font-override')) return;
+                var style = document.createElement('style');
+                style.id = 'luna-font-override';
+                style.textContent = `
+                  @font-face {
+                    font-family: 'Google Sans';
+                    src: url('$FONT_URL') format('truetype');
+                    font-weight: 100 900;
+                    font-style: normal;
+                    font-display: swap;
+                  }
+                  html, body {
+                    font-family: 'Google Sans', 'Noto Sans SC', 'PingFang SC', sans-serif !important;
+                  }
+                  body *:not(i):not(svg):not(path):not([class*="icon"]):not([class*="material-icons"]):not([class*="material-symbols"]):not([class*="fa-"]):not([class*="fa "]):not([class*="glyphicon"]):not([class*="codicon"]):not([class*="octicon"]):not([data-icon]):not([aria-hidden="true"]) {
+                    font-family: 'Google Sans', 'Noto Sans SC', 'PingFang SC', sans-serif !important;
+                  }
+                `;
+                (document.head || document.documentElement).appendChild(style);
+              } catch (e) {}
+            })();
+        """.trimIndent()
+
         val DOMAIN_PATTERN = Regex(
             """^(?:[\w-]+\.)+[A-Za-z]{2,}(?::\d+)?(?:[/?#].*)?$""",
         )
