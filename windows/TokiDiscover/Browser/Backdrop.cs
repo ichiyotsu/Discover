@@ -1,7 +1,6 @@
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
 
 namespace TokiDiscover.Browser;
 
@@ -26,17 +25,5 @@ internal static class Backdrop
             root.Background = (Brush)Application.Current.Resources["SolidBackgroundFillColorBaseBrush"];
         }
 
-        try
-        {
-            var titleBar = window.AppWindow.TitleBar;
-            titleBar.BackgroundColor = Colors.Transparent;
-            titleBar.InactiveBackgroundColor = Colors.Transparent;
-            titleBar.ButtonBackgroundColor = Colors.Transparent;
-            titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-        }
-        catch
-        {
-            // Title bar colors are unavailable on some Windows 10 builds.
-        }
     }
 }

@@ -96,11 +96,15 @@ public sealed partial class MainWindow : Window
             web.CoreWebView2.SourceChanged += (_, _) => DispatcherQueue.TryEnqueue(() => SyncAddress(tab));
             web.CoreWebView2.HistoryChanged += (_, _) => DispatcherQueue.TryEnqueue(UpdateNavButtons);
             web.CoreWebView2.NavigationCompleted += (_, _) => DispatcherQueue.TryEnqueue(() => SyncAddress(tab));
-            web.CoreWebView2.NewWindowRequested += (_, args) =>
+            web.CoreWebView2.NewWindowRequested += (sender, args) =>
             {
                 args.Handled = true;
-                var target = args.Uri;
-                DispatcherQueue.TryEnqueue(() => _ = CreateTab(tab.IsPrivate, target));
+                var targetUrl = args.Uri;
+                var isPrivate = tab.IsPrivate;
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    _ = CreateTab(isPrivate, targetUrl);
+                });
             };
             web.CoreWebView2.WebMessageReceived += (_, args) =>
             {
@@ -130,7 +134,7 @@ public sealed partial class MainWindow : Window
             if (_normalEnvironment != null) return _normalEnvironment;
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TokiDiscover", "WebView2");
             Directory.CreateDirectory(folder);
-            _normalEnvironment = await CoreWebView2Environment.CreateAsync(null, folder);
+            _normalEnvironment = await CoreWebView2Environment.CreateWithOptionsAsync(null!, folder, null!);
             return _normalEnvironment;
         }
 
@@ -138,7 +142,7 @@ public sealed partial class MainWindow : Window
         _privateFolder = Path.Combine(Path.GetTempPath(), "TokiDiscover", "private-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_privateFolder);
         var options = new CoreWebView2EnvironmentOptions();
-        _privateEnvironment = await CoreWebView2Environment.CreateAsync(null, _privateFolder, options);
+        _privateEnvironment = await CoreWebView2Environment.CreateWithOptionsAsync(null!, _privateFolder, options);
         return _privateEnvironment;
     }
 

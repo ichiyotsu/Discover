@@ -67,12 +67,18 @@ jobs:
           -p:Platform=x64
           -p:WindowsPackageType=None
           -p:WindowsAppSDKSelfContained=true
-          -o windows/TokiDiscover/bin/publish
-      - name: Portable zip
+      - name: Stage publish output
         shell: pwsh
         run: |
+          $publish = Get-ChildItem -Path windows/TokiDiscover/bin -Recurse -Directory -Filter publish |
+            Where-Object { Test-Path (Join-Path $_.FullName 'TokiDiscover.exe') } |
+            Select-Object -First 1
+          if (-not $publish) { throw 'Publish output was not found.' }
+          $stage = 'windows/TokiDiscover/bin/publish'
+          if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
+          Copy-Item -Recurse $publish.FullName $stage
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Compress-Archive -Path windows/TokiDiscover/bin/publish/* -DestinationPath dist/TokiDiscover-0.1.0-windows-portable.zip -Force
+          Compress-Archive -Path "$stage/*" -DestinationPath dist/TokiDiscover-0.1.0-windows-portable.zip -Force
       - name: Setup installer
         shell: pwsh
         run: |
