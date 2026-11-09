@@ -1,24 +1,31 @@
-node_modules/
-dist/
-out/
-*.log
-.DS_Store
-src/renderer/vendor/
-tests/artifacts/
-
-# Android build output and machine-specific files
+# Android
 android/.gradle/
-android/.kotlin/
-android/.idea/
 android/build/
 android/app/build/
 android/local.properties
-android/*.iml
-android/*.hprof
+android/.kotlin/
+android/captures/
+*.apk
+*.aab
+!android/tokidiscover.jks
 
-# Temporary emulator QA files (not part of the app)
-android/docs-*.png
-android/ui*.xml
-android/test-settings-*.xml
-android/parse_ui.py
-android/overlay_bounds.py
+# .NET / WinUI
+windows/**/bin/
+windows/**/obj/
+windows/publish/
+dist/
+
+# Xcode / iOS
+ios/build/
+ios/DerivedData/
+ios/*.xcodeproj/
+ios/*.xcworkspace/
+ios/**/*.xcuserstate
+xcuserdata/
+
+# OS / IDE
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.iml
