@@ -138,6 +138,7 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -145,6 +146,7 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           tag="${GITHUB_REF_NAME}"
           notes=$(cat <<EOF
@@ -157,8 +159,12 @@ jobs:
           仓库中的 Android 签名口令是公开的，只用于这个开源构建。分叉后若要对外发布，请更换自己的密钥库。
           EOF
           )
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" artifacts/* --clobber
+          mapfile -t files < <(find artifacts -type f | sort)
+          printf 'Uploading:\n'
+          printf '  %s\n' "${files[@]}"
+          test "${#files[@]}" -ge 4
+          if gh release view "$tag" --repo "$GH_REPO" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --repo "$GH_REPO" --clobber
           else
-            gh release create "$tag" artifacts/* --title "TokiDiscover ${tag#v}" --notes "$notes"
+            gh release create "$tag" "${files[@]}" --repo "$GH_REPO" --target "$GITHUB_SHA" --title "TokiDiscover ${tag#v}" --notes "$notes"
           fi
