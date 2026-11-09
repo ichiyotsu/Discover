@@ -25,7 +25,6 @@ final class BrowserTab: Identifiable, ObservableObject {
         let view = WKWebView(frame: .zero, configuration: configuration)
         view.allowsBackForwardNavigationGestures = true
         self.webView = view
-        super.init()
         observations = [
             view.observe(\.title, options: [.new]) { [weak self] web, _ in
                 let title = web.title

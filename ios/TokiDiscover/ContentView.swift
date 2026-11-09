@@ -31,8 +31,15 @@ struct ContentView: View {
         .translationTask(sessionConfiguration) { session in
             var lines: [String] = []
             for chunk in model.pendingChunks {
-                let response = try await session.translate(chunk)
-                lines.append(response.targetText)
+                do {
+                    let response = try await session.translate(chunk)
+                    lines.append(response.targetText)
+                } catch {
+                    await MainActor.run {
+                        model.status = Copy.zh ? "系统翻译不可用，可改用在线翻译" : "System translation is unavailable. Try online translate."
+                    }
+                    return
+                }
             }
             await model.applyTranslation(lines)
         }
