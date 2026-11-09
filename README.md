@@ -1,146 +1,126 @@
-# Luna
+# TokiDiscover
 
-**Luna** 是一个把地址栏做成悬浮玻璃胶囊的浏览器。地址栏与工具栏一起停靠在窗口顶部或底部，可在设置里实时切换；网页内容装在一张圆角卡片里，随工具栏自动让位。
+TokiDiscover 0.1.0 是一个轻量、开源、跨平台的网页浏览器。三个平台各自使用原生界面，而不是套一层共用的网页壳。
 
-界面基于非官方 Material 3 Expressive Web Components 库 [`@materialwebunofficial/md3e-web`](https://materialwebunofficial.github.io/#home)，动态色、形状和弹簧动效全部来自 md3e tokens。
+| 平台 | 技术 | 界面 |
+| --- | --- | --- |
+| Windows 10 / 11 | C#、WinUI 3（Windows App SDK）、WebView2 | Fluent。Windows 11 使用 Mica，不支持时退回 Acrylic，再不行则使用实色 |
+| Android 8.0+（面向 Android 17） | Kotlin、Jetpack Compose、系统 WebView | Material 3 Expressive：`MaterialExpressiveTheme`、动态取色、弹簧动效、悬浮工具栏 |
+| iOS / iPadOS 26+ | SwiftUI、WKWebView | Liquid Glass 悬浮栏。内容放在安全区内，不长期压住网页 |
 
-[![Latest release](https://img.shields.io/badge/release-0.1.0--beta.3-5B5BD6)](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.3)
+版本号：**0.1.0**。许可证：[Apache-2.0](LICENSE)。
 
-| 桌面端 | Android |
+## 功能
+
+- 悬浮地址栏会在页面向下滚动时收成一颗小胶囊，向上滚动或点按后展开。网页排在栏的外侧，不会被栏永久挡住。
+- 标签页、后退、前进、刷新、主页。
+- 搜索引擎可选 Google、Bing、DuckDuckGo、百度。地址栏能区分网址和搜索词。
+- 无痕模式：
+  - Windows：独立的临时 WebView2 配置目录，最后一个无痕标签关闭后删除。
+  - Android：在系统 WebView 支持多配置时使用名为 `toki-private` 的 Profile，并在无痕标签全部关闭后清掉该配置的 Cookie 与 Web Storage。
+  - iOS：`WKWebsiteDataStore.nonPersistent()`，数据不写入磁盘。
+- 翻译：
+  - Android：ML Kit 设备端翻译可见文本；失败时可以改用在线翻译页。
+  - Windows：WebView2 没有公开的整页翻译 API，因此打开翻译服务页面作为后备。
+  - iOS：使用系统 Translation 框架翻译页面中的可见文本，也可以改用在线翻译页。
+
+## 安装
+
+构建产物由 GitHub Actions 在推送标签 `v*`（例如 `v0.1.0`）时上传到对应的 GitHub Release。也可以在 Actions 里手动运行 **Build**。
+
+| 文件 | 用途 |
 | --- | --- |
-| ![Luna 桌面新标签页](docs/luma-newtab.png) | ![Luna Android 新标签页](docs/android-top.png) |
+| `TokiDiscover-0.1.0-windows-setup.exe` | Windows 安装程序 |
+| `TokiDiscover-0.1.0-windows-portable.zip` | Windows 便携版，解压后运行 `TokiDiscover.exe` |
+| `TokiDiscover-0.1.0-android.apk` | Android arm64-v8a 已签名安装包 |
+| `TokiDiscover-0.1.0-ios-unsigned.ipa` | 未签名 iOS 包，供侧载 |
 
-## 下载
+### Windows
 
-Release **0.1.0-beta.3**：
+1. Windows 11 可以直接安装。Windows 10 需要先安装 [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)（Evergreen）。
+2. 运行 `TokiDiscover-0.1.0-windows-setup.exe`，或解压便携版后启动 `TokiDiscover.exe`。
+3. 安装程序默认装到当前用户目录，不需要管理员权限。
 
-- **Android**：`Luna-0.1.0-beta.3-android.apk`，最低 Android 12（API 31），使用系统 Chromium WebView。全屏网页、悬浮底栏、横向滑动收起、磨砂状态栏、简约主页与自定义背景、Google Sans Flex（含网页字体）、二级设置、标签页预览、更新与历史管理均已包含。
-- **Windows x64**：源码随仓库发布；运行 `pnpm install && pnpm package` 生成便携包。218MB 的便携包本次未随 Release 上传。
-- **源码**：GitHub 自动生成 Source code zip。
+Windows 包是未打包（unpackaged）的自包含 WinUI 3 程序，不依赖另外安装 Windows App SDK 运行时。
 
-前往 [GitHub Releases](https://github.com/ichiyotsu/Discover/releases/tag/0.1.0-beta.3) 下载。
+### Android
 
-> 0.1.0-beta.3 是 Android 测试版，安装包用调试密钥签名，适合本地体验，不适合上架应用商店。
+允许浏览器安装未知来源应用后，打开 APK 即可。`minSdk` 为 26（Android 8.0），`compileSdk` / `targetSdk` 为 Android 17（API 37.2 / API 37）。安装包只包含 `arm64-v8a`，并开启了 R8 与资源压缩。
 
-## 截图
+签名密钥库提交在 `android/tokidiscover.jks`，口令写在 `android/keystore.properties`（别名、库口令、密钥口令都是 `tokidiscover`）。同一签名的后续版本可以直接覆盖安装。这个口令是公开的，只服务于本仓库的开源构建；如果你要对外发布自己的版本，请更换密钥库。
 
-| 桌面设置 | 桌面 · 底部工具栏 · 深色 |
-| --- | --- |
-| ![Luna 设置](docs/luma-settings.png) | ![Luna 深色底部](docs/luma-bottom-dark.png) |
+首次使用「翻译」时，ML Kit 会按需下载语言模型，模型不打进 APK。
 
-| Android 浏览器 | Android · 深色 |
-| --- | --- |
-| ![Luna Android 页面](docs/android-browsing.png) | ![Luna Android 深色](docs/android-dark.png) |
+### iOS / iPadOS
 
-## 桌面端
+这个 IPA **没有 Apple 签名**，也不能从 App Store 或直接用系统安装器安装。仓库里没有 Apple 开发者证书。
 
-### 功能
+用 AltStore 或 SideStore 侧载时，需要用你自己的 Apple ID 重新签名：
 
-- **悬浮地址栏 + 工具栏**：同一组玻璃组件，支持顶部 / 底部停靠，切换时页面自动重排。
-- **Chromium 内核**：Electron 45 内置 Chromium；网页运行在隔离 WebView 中，禁用 Node 集成。
-- **多标签页**：新建、关闭、重开、顺序切换；独立标题、favicon、加载状态。
-- **地址栏**：网址识别、搜索引擎回退、本地历史 / 书签补全、键盘上下选择、安全状态、复制网址。
-- **书签与历史**：本地持久化、搜索、清空、撤销、书签星标。
-- **自定义新标签页**：本地生成、不联网；时间、问候、快捷方式、搜索。
-- **设置**：顶部 / 底部工具栏、跟随系统 / 浅色 / 深色、8 种主题色种子、搜索引擎、快捷方式、玻璃效果。
-- **md3e 设计系统**：HCT 动态色、Material Symbols、弹簧动效、`md-dialog`、`md-switch`、`md-segmented-button`、`md-progress-indicator`。
-- **原生感窗口**：无边框窗口、自绘窗口控制、拖拽区、窗口位置记忆。
+1. 在 iOS / iPadOS 26 或更高版本的设备上安装 [AltStore](https://altstore.io/) 或 [SideStore](https://sidestore.io/)。
+2. 把 `TokiDiscover-0.1.0-ios-unsigned.ipa` 传到设备，在 AltStore / SideStore 里选择安装。
+3. 按侧载工具的提示登录 Apple ID 并信任描述文件。免费 Apple ID 的签名大约 7 天后失效，需要重新签名。
+4. 系统翻译第一次使用某种语言时，可能会要求下载语言包。
 
-### 从源码运行
+侧载应用的包标识是 `dev.ichiyotsu.tokidiscover`。
 
-要求：Node.js 20+、pnpm 9+。
+## 从源码构建
+
+### Windows
+
+需要 Windows 10 或 11、.NET 10 SDK。
 
 ```powershell
-pnpm install
-pnpm start
+dotnet publish windows/TokiDiscover/TokiDiscover.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true -o windows/TokiDiscover/bin/publish
 ```
 
-`pnpm start` 会把 md3e 运行时同步到 `src/renderer/vendor/md3e`，然后启动 Electron。
-
-开发模式：
+安装包使用 [Inno Setup 6](https://jrsoftware.org/isinfo.php)：
 
 ```powershell
-pnpm dev
+& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" windows/installer/TokiDiscover.iss
 ```
 
-### 构建 Windows 版
+### Android
 
-```powershell
-pnpm package
-```
+需要 JDK 21 和 Android SDK Platform 37.2、Build-Tools 37.0.0。
 
-产物在 `dist/Luna-win32-x64`。
-
-### 快捷键
-
-| 操作 | 快捷键 |
-| --- | --- |
-| 聚焦地址栏 | `Ctrl L` |
-| 新建 / 关闭标签页 | `Ctrl T` / `Ctrl W` |
-| 重开关闭的标签页 | `Ctrl Shift T` |
-| 切换标签页 | `Ctrl Tab` / `Ctrl Shift Tab` |
-| 按序号切换 | `Ctrl 1` … `Ctrl 8`，`Ctrl 9` 最后一个 |
-| 后退 / 前进 | `Alt ←` / `Alt →` |
-| 刷新 / 强制刷新 | `Ctrl R` / `Ctrl Shift R` |
-| 缩放 | `Ctrl +` / `Ctrl -` / `Ctrl 0` |
-| 历史记录 / 下载内容 | `Ctrl H` / `Ctrl J` |
-| 设置 | `Ctrl ,` |
-| 全屏 | `F11` |
-
-## Android
-
-`android/` 是同一产品的原生 Android 版本：Jetpack Compose + Android WebView（Chromium）。
-
-- 悬浮工具栏支持顶部 / 底部停靠，设置持久化。
-- 地址栏支持网址识别、搜索、历史补全；底部模式下键盘弹出时工具栏自动上移。
-- 标签页切换底部面板、历史记录面板、设置面板。
-- 明暗模式、搜索引擎、下载、新窗口、系统返回。
-- md3e 本身是 Web Components，不能直接运行在 Compose 中；Android 端按同一套设计语言复刻了动态色、大圆角、胶囊形状和弹簧动效。
-
-构建：
-
-```powershell
+```bash
+export ANDROID_HOME="$HOME/android-sdk"
 cd android
-$env:JAVA_HOME = "D:\Application\Android Studio\jbr"
-.\gradlew.bat assembleRelease
+chmod +x gradlew
+./gradlew assembleRelease
 ```
 
-产物在 `android/app/build/outputs/apk/release/app-release.apk`。详见 [`android/README.md`](android/README.md)。
+签名 APK 在 `android/app/build/outputs/apk/release/`。
 
-## 项目结构
+### iOS
 
-```text
-src/main/main.js          Electron 主进程：窗口、WebView 安全边界、权限、下载、快捷键
-src/main/preload.js       contextBridge API
-src/renderer/index.html   浏览器 UI 骨架
-src/renderer/styles.css   md3e 悬浮界面与响应式布局
-src/renderer/app.js       标签、地址栏、历史、书签、设置、窗口交互
-src/renderer/newtab.*     本地新标签页
-src/renderer/vendor/md3e  md3e 运行时（由 sync:vendor 同步，不手改）
-android/                  Kotlin + Compose + WebView 原生 Android 版本
-scripts/                  资源同步与打包
-tests/                    Playwright 测试、本地示例站点
-docs/                     截图
+需要 macOS 26 和 Xcode 26，以及 [XcodeGen](https://github.com/yonaskolb/XcodeGen)。
+
+```bash
+brew install xcodegen
+cd ios
+xcodegen generate
+xcodebuild \
+  -project TokiDiscover.xcodeproj \
+  -scheme TokiDiscover \
+  -configuration Release \
+  -sdk iphoneos \
+  -destination 'generic/platform=iOS' \
+  CODE_SIGNING_ALLOWED=NO \
+  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGN_IDENTITY="" \
+  build
 ```
 
-## 测试
+把生成的 `TokiDiscover.app` 放进 `Payload/` 再打成 zip，并把扩展名改为 `.ipa`，就得到未签名安装包。
 
-```powershell
-pnpm test:flow       # 真实加载、标签、书签、补全、错误页、主题、工具栏位置
-pnpm test:packaged   # 启动打包后的 Luna.exe，验证 asar 内的本地页面
-```
+## 发布
 
-Android 端在 Android 12（API 31）模拟器上验证过启动、导航、顶部/底部切换、标签页和键盘避让。
+`.github/workflows/release.yml` 会在拉取请求、手动触发，以及推送 `v*` 标签时编译三个平台。只有标签推送会创建 GitHub Release，并附上上面列出的四个文件。
 
-## 已知限制
+## 设计说明
 
-- Electron 与系统 WebView 都不包含 Widevine；Netflix 等 DRM 流媒体不可用。
-- `window.open` 登录流程会转成新标签页；少数依赖 opener 的 OAuth 流程可能失败。
-- 没有扩展商店、账户同步、自动更新。
-- Android 端暂不包含书签管理、Incognito、跨进程标签恢复。
-- 桌面打包版未做代码签名，Windows SmartScreen 可能提示未知发布者。
-- Android 安装包使用调试密钥签名，适合本地安装体验。
-
-## 许可
-
-Luna 源代码采用 Apache License 2.0。md3e 是独立开源项目，同样使用 Apache License 2.0，详见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+- Windows 遵循 Fluent 的克制、熟悉和系统个性化：标题栏融入窗口，控件使用系统画笔和圆角，Mica / Acrylic 随桌面变化。
+- Android 使用 Material 3 Expressive。主题是 `MaterialExpressiveTheme` 加 `MotionScheme.expressive()`；Android 12 及以上跟随壁纸动态取色。底部 `HorizontalFloatingToolbar` 在滚动时收到悬浮按钮。
+- iOS 26 的地址栏使用 `glassEffect` 与 `GlassEffectContainer`。开启「降低透明度」时退回系统 Material。页面放在 `safeAreaInset` 里，工具栏变矮时页面区域跟着变高。
