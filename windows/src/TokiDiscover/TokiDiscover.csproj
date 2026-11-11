@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250602001" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3650.58" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
   <ItemGroup><ProjectReference Include="..\TokiDiscover.Core\TokiDiscover.Core.csproj" /></ItemGroup>
