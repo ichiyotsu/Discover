@@ -28,9 +28,9 @@
 
 - Android：SharedPreferences + JSON（BrowserStore/SettingsStore，API 稳定，可替换为 DataStore 实现）。
 - iOS：UserDefaults + JSON（AppModel）。
-- Windows：内存 + LocalSettings/LocalFolder 的接线点在 BrowserService（0.1.0-beta1 运行时以内存为主，重启不恢复书签/历史 — 见限制）。
+- Windows：内存 + LocalSettings/LocalFolder 的接线点在 BrowserService（0.1.0 运行时以内存为主，重启不恢复书签/历史 — 见限制）。
 
-## 已知限制（0.1.0-beta1，诚实清单）
+## 已知限制（0.1.0，诚实清单）
 
 1. Android 下载：DownloadListener 已记录文件名/网址/大小到书库，但实际文件保存（DownloadManager 接线）未做。
 2. iOS 下载：仅模型 + 空状态，无真实下载管理；分享为系统分享的接线点在后续补齐（当前 RootView 未挂分享按钮）。
