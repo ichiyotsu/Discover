@@ -11,4 +11,5 @@ final class UrlNormalizerTests: XCTestCase {
     func testEngines() { XCTAssertEqual(SearchEngine.google.searchURL("a b"), "https://www.google.com/search?q=a+b")
         XCTAssertEqual(SearchEngine.custom.searchURL("a b", customTemplate: "https://s.example/?q={query}"), "https://s.example/?q=a+b") }
     func testAssetVersion() { XCTAssertEqual(UpdateChecker.parseVersion(fromAssetName: "TokiDiscover-0.2.0-ios.ipa"), "0.2.0") }
+    func testAssetVersionBetaApk() { XCTAssertEqual(UpdateChecker.parseVersion(fromAssetName: "TokiDiscover-0.1.0-beta1.apk"), "0.1.0-beta1") }
 }
