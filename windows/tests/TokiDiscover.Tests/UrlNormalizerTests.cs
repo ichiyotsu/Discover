@@ -14,5 +14,6 @@ public class UrlNormalizerTests
         Assert.Equal("https://www.baidu.com/s?wd=a+b", SearchEngine.Baidu.SearchUrl("a b"));
         Assert.Equal("https://s.example/?q=a+b", SearchEngine.Custom.SearchUrl("a b", "https://s.example/?q={query}")); }
     [Fact] public void AssetVersion() => Assert.Equal("0.2.0", UpdateChecker.ParseVersionFromAssetName("TokiDiscover-0.2.0-win-x64.exe"));
+    [Fact] public void AssetVersionBetaApk() => Assert.Equal("0.1.0-beta1", UpdateChecker.ParseVersionFromAssetName("TokiDiscover-0.1.0-beta1.apk"));
     [Fact] public void TabManagerPrivateTab() { var m = new TabManager(); var t = m.NewTab(isPrivate: true); Assert.True(t.IsPrivate); Assert.Equal(t.Id, m.ActiveTabId); m.CloseTab(t.Id); Assert.Single(m.Tabs); }
 }
