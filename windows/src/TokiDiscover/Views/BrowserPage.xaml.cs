@@ -26,7 +26,7 @@ public sealed partial class BrowserPage : Page
         HomePanel.Visibility = Visibility.Collapsed; Web.Visibility = Visibility.Visible;
         await Web.EnsureCoreWebView2Async();
         Web.CoreWebView2.Settings.AreDevToolsEnabled = true;
-        Web.CoreWebView2.Settings.IsJavaScriptEnabled = App.Browser.JavaScriptEnabled;
+        Web.CoreWebView2.Settings.IsScriptEnabled = App.Browser.JavaScriptEnabled;
         if (App.Browser.Tabs.Active.IsPrivate) { /* WebView2 inPrivate equivalent: separate CoreWebView2Environment per private session is a TODO — see ARCHITECTURE.md */ }
         Web.CoreWebView2.NavigationStarting += (_, e) => { if (!UrlNormalizer.IsSafeScheme(e.Uri)) e.Cancel = true; _loading = true; };
         Web.CoreWebView2.NavigationCompleted += (_, _) => { _loading = false; tab.CanGoBack = Web.CanGoBack; tab.CanGoForward = Web.CanGoForward;
@@ -47,7 +47,12 @@ public sealed partial class BrowserPage : Page
     private void SpeedDial_Click(object sender, RoutedEventArgs e) { if (sender is Button b && b.Tag is string url) { App.Browser.Tabs.Active.Url = url; _ = InitAsync(); App.Window?.RefreshTabList(); } }
     private void Bookmark_Click(object sender, RoutedEventArgs e) => App.Browser.ToggleBookmark(App.Browser.Tabs.Active);
     private void Find_Click(object sender, RoutedEventArgs e) => FindBox.Visibility = Visibility.Visible;
-    private void FindBox_KeyDown(object sender, KeyRoutedEventArgs e) { if (e.Key == VirtualKey.Enter) _ = Web.CoreWebView2?.Find.FindAsync(FindBox.Text, CoreWebView2FindOptions.None); }
+    private void FindBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter || Web.CoreWebView2 == null) return;
+        var find = Web.CoreWebView2.Find; find.Stop(); // restart the find session from the first match
+        _ = find.StartAsync(new CoreWebView2FindOptions { FindTerm = FindBox.Text, ShouldHighlightAllMatches = true, SuppressDefaultFindDialog = true });
+    }
     private void Share_Click(object sender, RoutedEventArgs e)
     {
         var tab = App.Browser.Tabs.Active; var pkg = new DataPackage(); pkg.SetText(tab.Url);
