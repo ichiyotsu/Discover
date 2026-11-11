@@ -3,7 +3,7 @@
 Toki 系列的轻量三端浏览器：底部悬浮胶囊地址栏、多标签（含无痕）、书签/历史/下载书库，
 设计规范与 Tokinote / tokimusic 完全一致（Matcha 配色、TokiShapes、悬浮毛玻璃胶囊）。
 
-- 版本：**0.1.0-beta1**
+- 版本：**0.1.0**
 - 平台与引擎：Android（Kotlin + Jetpack Compose，系统 WebView，包名 `com.tokidiscover.app`）/
   iOS（SwiftUI，WKWebView）/ Windows（原生 WinUI 3，WebView2）
 - 默认搜索引擎：Bing（设置里可换 Google / DuckDuckGo / 百度 / 自定义模板）
