@@ -130,14 +130,23 @@ jobs:
           name: TokiDiscover-0.1.0-ios
           path: TokiDiscover-0.1.0-ios-unsigned.ipa
 
+  version:
+    name: Version order
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare release and prerelease versions
+        run: bash scripts/version.sh --self-test
+
   release:
     name: GitHub Release
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [android, windows, ios]
+    needs: [android, windows, ios, version]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
@@ -145,20 +154,34 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           tag="${GITHUB_REF_NAME}"
-          notes=$(cat <<EOF
-          TokiDiscover ${tag#v}
+          version="${tag#v}"
+          kind="$(bash scripts/version.sh --kind "$tag")"
+          if [[ "$kind" == "prerelease" ]]; then
+            create_args=(--prerelease --latest=false)
+            edit_args=(--prerelease --latest=false)
+          else
+            create_args=(--latest)
+            edit_args=(--prerelease=false --latest)
+          fi
+          cat > release-notes.txt <<EOF
+          TokiDiscover ${version}
 
           - Windows：安装包与便携版。Windows 11 已包含 WebView2；Windows 10 需安装 Evergreen WebView2 Runtime。
           - Android：arm64-v8a 已签名 APK，可覆盖安装后续版本。
-          - iOS / iPadOS：未签名 IPA，需用 AltStore 或 SideStore 自行签名后侧载，不能直接安装。
+          - iOS / iPadOS：未签名 IPA，需用 SideStore 自行签名后侧载。
 
           仓库中的 Android 签名口令是公开的，只用于这个开源构建。分叉后若要对外发布，请更换自己的密钥库。
           EOF
-          )
-          if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" artifacts/* --clobber
+          mapfile -t files < <(find artifacts -type f | sort)
+          printf 'Uploading %s (%s):\n' "$tag" "$kind"
+          printf '  %s\n' "${files[@]}"
+          test "${#files[@]}" -ge 4
+          if gh release view "$tag" --repo "$GH_REPO" >/dev/null 2>&1; then
+            gh release upload "$tag" "${files[@]}" --repo "$GH_REPO" --clobber
+            gh release edit "$tag" --repo "$GH_REPO" --title "TokiDiscover ${version}" --notes-file release-notes.txt "${edit_args[@]}"
           else
-            gh release create "$tag" artifacts/* --title "TokiDiscover ${tag#v}" --notes "$notes"
+            gh release create "$tag" "${files[@]}" --repo "$GH_REPO" --target "$GITHUB_SHA" --title "TokiDiscover ${version}" --notes-file release-notes.txt "${create_args[@]}"
           fi
