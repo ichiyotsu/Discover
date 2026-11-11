@@ -41,7 +41,7 @@ public enum UrlNormalizer {
 /// the same false-update bug fixed in Tokilive/tokimusic (tags shipped mismatched asset versions).
 public enum UpdateChecker {
     public static func parseVersion(fromAssetName name: String) -> String? {
-        guard let re = try? NSRegularExpression(pattern: #"(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)[0-9A-Za-z.]*)?)"#),
+        guard let re = try? NSRegularExpression(pattern: #"(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)\d+(?:\.\d+)*)?)"#),
               let m = re.firstMatch(in: name, range: NSRange(name.startIndex..., in: name)),
               let r = Range(m.range(at: 1), in: name) else { return nil }
         return String(name[r])
