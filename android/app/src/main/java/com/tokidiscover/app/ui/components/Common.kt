@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.tokidiscover.app.ui.theme.ExpressiveCardShape
 import com.tokidiscover.app.ui.theme.ExpressiveChipShape
 /** PillGroup segmented control (Tokinote): used by Library (书签/历史/下载) and Settings pickers. */
-@Composable fun PillGroup(options: List<String>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+@Composable fun PillGroup(options: List<String>, selected: Int, modifier: Modifier = Modifier, onSelect: (Int) -> Unit) {
     Row(modifier.clip(ExpressiveChipShape).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         options.forEachIndexed { i, label ->
             val sel = i == selected
