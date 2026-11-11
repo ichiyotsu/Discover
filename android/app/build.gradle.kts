@@ -3,7 +3,7 @@ plugins { alias(libs.plugins.android.application); alias(libs.plugins.kotlin.com
 // AGP 9 has built-in Kotlin support: the org.jetbrains.kotlin.android plugin must NOT be applied.
 // Release versioning/signing are driven by environment (set by .github/workflows/release.yml),
 // same pattern as Tokinote. Local builds fall back to the defaults below and the debug key.
-val releaseVersionName: String = System.getenv("VERSION_NAME") ?: "0.1.0-beta1"
+val releaseVersionName: String = System.getenv("VERSION_NAME") ?: "0.1.0"
 val releaseVersionCode: Int = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
 val releaseKeystore: String? = System.getenv("KEYSTORE_FILE")
 android {
