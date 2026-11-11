@@ -7,7 +7,7 @@ import java.net.URL
  *  versions before, so the version is parsed from the APK asset *filename* first, falling back to the tag. */
 object UpdateChecker {
     const val RELEASES_API = "https://api.github.com/repos/ichiyotsu/tokidiscover/releases/latest"
-    fun parseVersionFromAssetName(name: String): String? = Regex("""(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)[0-9A-Za-z.]*)?)""").find(name)?.groupValues?.get(1)
+    fun parseVersionFromAssetName(name: String): String? = Regex("""(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)\d+(?:\.\d+)*)?)""").find(name)?.groupValues?.get(1)
     fun extractLatestVersion(releaseJson: String): String? {
         val o = JSONObject(releaseJson); val assets = o.optJSONArray("assets")
         if (assets != null) for (i in 0 until assets.length()) { val n = assets.getJSONObject(i).optString("name")
