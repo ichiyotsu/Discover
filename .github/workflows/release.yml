@@ -1,0 +1,199 @@
+name: Release
+
+# One tag publishes every platform.
+#   git tag 0.1.0 && git push origin 0.1.0
+# A tag that contains "-" is a prerelease (e.g. 0.1.0-beta1). A plain X.Y.Z tag
+# is a normal release and is marked Latest.
+# Android signing uses this repo's own keystore, stored in GitHub Secrets:
+#   KEYSTORE_BASE64 / KEYSTORE_PASSWORD / KEY_ALIAS / KEY_PASSWORD
+# versionCode stays the default in android/app/build.gradle.kts unless
+# VERSION_CODE is set.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "[0-9]*"
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == v[0-9]* ]]; then
+            TAG="${TAG#v}"
+          fi
+          echo "VERSION_NAME=$TAG" >> "$GITHUB_ENV"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platforms;android-36 build-tools;36.0.0
+
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Build signed APK and AAB
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          VERSION_NAME: ${{ env.VERSION_NAME }}
+        run: bash ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace -x lintVitalAnalyzeRelease -x lintVitalRelease
+
+      - name: Name release artifacts
+        run: |
+          mkdir -p ../dist
+          cp app/build/outputs/apk/release/app-release.apk "../dist/TokiDiscover-${VERSION_NAME}.apk"
+          cp app/build/outputs/bundle/release/app-release.aab "../dist/TokiDiscover-${VERSION_NAME}.aab"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-android
+          path: dist/*
+          if-no-files-found: error
+
+  windows:
+    name: Windows
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Unit tests
+        run: dotnet test tests/TokiDiscover.Tests/TokiDiscover.Tests.csproj -c Release --nologo
+
+      - name: Publish self-contained unpackaged app
+        run: dotnet publish src/TokiDiscover/TokiDiscover.csproj -c Release -r win-x64 --self-contained true -p:Platform=x64 -p:WindowsPackageType=None -p:WindowsAppSDKSelfContained=true
+
+      - name: Zip publish output
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if ($tag.StartsWith("v") -and $tag.Length -gt 1 -and [char]::IsDigit($tag[1])) {
+            $tag = $tag.Substring(1)
+          }
+          $exe = Get-ChildItem -Recurse -Filter TokiDiscover.exe windows/src/TokiDiscover/bin |
+            Where-Object { $_.FullName -match '\\publish\\' } |
+            Select-Object -First 1
+          if (-not $exe) { throw "TokiDiscover.exe was not published" }
+          $name = "TokiDiscover-Windows-$tag-win-x64.zip"
+          if (Test-Path $name) { Remove-Item $name }
+          Compress-Archive -Path (Join-Path $exe.DirectoryName "*") -DestinationPath $name
+          Add-Content -Path $env:GITHUB_ENV -Value "ASSET_NAME=$name"
+          Get-Item $name | Select-Object FullName, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows
+          path: ${{ env.ASSET_NAME }}
+          if-no-files-found: error
+
+  ios:
+    name: iOS
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Unit tests
+        run: swift test
+        working-directory: ios/TokiDiscoverCore
+
+      - name: Unsigned device build
+        run: |
+          set -eux
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == v[0-9]* ]]; then
+            TAG="${TAG#v}"
+          fi
+          chmod +x ios/scripts/unsigned-ipa.sh
+          ios/scripts/unsigned-ipa.sh "build/TokiDiscover-ios-${TAG}.ipa"
+          find ios/build -name '*.ipa' -print
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-ios
+          path: ios/build/*.ipa
+          if-no-files-found: error
+
+  publish:
+    name: Publish
+    needs: [android, windows, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == v[0-9]* ]]; then
+            TAG="${TAG#v}"
+          fi
+          echo "VERSION_NAME=$TAG" >> "$GITHUB_ENV"
+          if [[ "$TAG" == *-* ]]; then
+            echo "IS_PRERELEASE=true" >> "$GITHUB_ENV"
+          else
+            echo "IS_PRERELEASE=false" >> "$GITHUB_ENV"
+          fi
+          NOTES=".github/release-notes/${TAG}.md"
+          if [ ! -f "$NOTES" ]; then
+            printf 'TokiDiscover %s\n\n这一版包含修复和改进。\n' "$TAG" > /tmp/notes.md
+            NOTES=/tmp/notes.md
+          fi
+          echo "NOTES_FILE=$NOTES" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: List assets
+        run: ls -l dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: TokiDiscover ${{ env.VERSION_NAME }}
+          body_path: ${{ env.NOTES_FILE }}
+          prerelease: ${{ env.IS_PRERELEASE == 'true' }}
+          make_latest: ${{ env.IS_PRERELEASE == 'false' }}
+          fail_on_unmatched_files: true
+          files: |
+            dist/TokiDiscover-${{ env.VERSION_NAME }}.apk
+            dist/TokiDiscover-${{ env.VERSION_NAME }}.aab
+            dist/TokiDiscover-Windows-${{ env.VERSION_NAME }}-win-x64.zip
+            dist/TokiDiscover-ios-${{ env.VERSION_NAME }}.ipa
