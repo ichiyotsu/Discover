@@ -1,13 +1,12 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.Web.WebView2.Core;
 using TokiDiscover.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
 namespace TokiDiscover.Views;
 /// <summary>Engine: WebView2 (Evergreen). Limitations: runtime must be installed (Evergreen bootstrapper in installer);
-/// downloads surface via DownloadStarting (recorded, state tracked by WebView2); find = CoreWebView2.Find API (WinAppSDK 1.6+).</summary>
+/// downloads surface via DownloadStarting (recorded, state tracked by WebView2); find = window.find() via ExecuteScriptAsync.</summary>
 public sealed partial class BrowserPage : Page
 {
     public static BrowserPage? Current { get; private set; }
@@ -50,8 +49,10 @@ public sealed partial class BrowserPage : Page
     private void FindBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Enter || Web.CoreWebView2 == null) return;
-        var find = Web.CoreWebView2.Find; find.Stop(); // restart the find session from the first match
-        _ = find.StartAsync(new CoreWebView2FindOptions { FindTerm = FindBox.Text, ShouldHighlightAllMatches = true, SuppressDefaultFindDialog = true });
+        // Native CoreWebView2.Find has no constructible FindOptions in the WinRT projection,
+        // so find-in-page goes through window.find() (wrapAround=true: repeated Enter cycles through matches).
+        var term = FindBox.Text.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", " ").Replace("\n", " ");
+        _ = Web.CoreWebView2.ExecuteScriptAsync($"window.find('{term}', false, false, true, false, false, false)");
     }
     private void Share_Click(object sender, RoutedEventArgs e)
     {
