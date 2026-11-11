@@ -31,5 +31,5 @@ enum TokiPalette {
 }
 extension Color { init(hex: UInt32) { self.init(red: Double((hex >> 16) & 0xFF) / 255, green: Double((hex >> 8) & 0xFF) / 255, blue: Double(hex & 0xFF) / 255) } }
 /// TokiShapes (points): extraSmall 8 / small 12 / medium 18 / large 26 / extraLarge 36; card 34/22/34/22, chip 20/20/20/7, capsule 36.
-let tokiCardCorners = UnevenRoundedRectangle(topLeadingRadius: 34, bottomTrailingRadius: 34, bottomLeadingRadius: 22, topTrailingRadius: 22)
-let tokiChipCorners = UnevenRoundedRectangle(topLeadingRadius: 20, bottomTrailingRadius: 20, bottomLeadingRadius: 7, topTrailingRadius: 20)
+let tokiCardCorners = UnevenRoundedRectangle(topLeadingRadius: 34, bottomLeadingRadius: 22, bottomTrailingRadius: 34, topTrailingRadius: 22)
+let tokiChipCorners = UnevenRoundedRectangle(topLeadingRadius: 20, bottomLeadingRadius: 7, bottomTrailingRadius: 20, topTrailingRadius: 20)
