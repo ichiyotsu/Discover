@@ -1,5 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="ic_launcher_background">#006A61</color>
-    <color name="window_background">#F4FBFA</color>
-</resources>
+<resources><color name="tokidiscover_primary">#4C662B</color><color name="tokidiscover_background">#F9FAEF</color></resources>

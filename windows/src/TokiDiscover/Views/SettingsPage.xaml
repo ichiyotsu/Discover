@@ -1,0 +1,20 @@
+<Page x:Class="TokiDiscover.Views.SettingsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ScrollViewer><StackPanel Margin="24" Spacing="14" MaxWidth="720">
+    <TextBlock Text="设置" FontSize="28" FontWeight="Bold" />
+    <TextBlock Text="搜索引擎（默认 Bing）" FontWeight="SemiBold" />
+    <ComboBox x:Name="EngineBox" SelectionChanged="EngineBox_SelectionChanged" />
+    <TextBox x:Name="CustomTemplateBox" Header="自定义模板（含 {query}）" Visibility="Collapsed" TextChanged="CustomTemplateBox_TextChanged" />
+    <TextBlock Text="浏览" FontWeight="SemiBold" />
+    <ToggleSwitch x:Name="DesktopUaSwitch" Header="桌面版 UA（WebView2 无内置桌面/移动 UA 切换，此开关为占位，见 ARCHITECTURE.md）" IsEnabled="False" />
+    <ToggleSwitch x:Name="JsSwitch" Header="JavaScript（切换后对新打开的页面生效）" Toggled="JsSwitch_Toggled" />
+    <TextBlock Text="新标签页固定为 TokiDiscover 主页，暂不支持自定义主页 URL" Opacity="0.6" TextWrapping="Wrap" />
+    <TextBlock Text="清除浏览数据" FontWeight="SemiBold" />
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button Content="Cookie + 缓存（WebView2 数据）" Click="ClearWebData_Click" /><Button Content="历史" Click="ClearHistory_Click" />
+    </StackPanel>
+    <TextBlock Text="关于" FontWeight="SemiBold" />
+    <TextBlock x:Name="AboutText" TextWrapping="Wrap" />
+    <Button Content="检查更新" Click="CheckUpdate_Click" />
+    <TextBlock x:Name="UpdateText" TextWrapping="Wrap" Opacity="0.8" />
+  </StackPanel></ScrollViewer>
+</Page>

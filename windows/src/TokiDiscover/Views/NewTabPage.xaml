@@ -1,0 +1,4 @@
+<Page x:Class="TokiDiscover.Views.NewTabPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Margin="40" Spacing="12"><TextBlock Text="新标签页" FontSize="28" FontWeight="Bold" />
+  <TextBlock Text="新标签页内容由 BrowserPage 的主页面板承载（胶囊搜索 + 常用站点）；此页为导航占位，保持工程结构与三端一致。" Opacity="0.6" TextWrapping="Wrap" /></StackPanel>
+</Page>

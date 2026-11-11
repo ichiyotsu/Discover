@@ -1,31 +1,10 @@
-# Android
-android/.gradle/
-android/build/
-android/app/build/
-android/local.properties
-android/.kotlin/
-android/captures/
-*.apk
-*.aab
-!android/tokidiscover.jks
-
-# .NET / WinUI
-windows/**/bin/
-windows/**/obj/
-windows/publish/
-dist/
-
-# Xcode / iOS
-ios/build/
-ios/DerivedData/
-ios/*.xcodeproj/
-ios/*.xcworkspace/
-ios/**/*.xcuserstate
-xcuserdata/
-
-# OS / IDE
-.DS_Store
-*.log
-.idea/
-.vscode/
+build/
+.gradle/
 *.iml
+.idea/
+local.properties
+bin/
+obj/
+DerivedData/
+*.xcuserstate
+.DS_Store

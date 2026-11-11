@@ -1,0 +1,6 @@
+// !$*UTF8*$!
+{ archiveVersion = 1; objectVersion = 56; objects = {
+/* Minimal hand-written project: sources are grouped by folder reference; regenerate with Xcode if it refuses to open.
+   Target: TokiDiscover (iOS 16+, SwiftUI, MARKETING_VERSION 0.1.0, CURRENT_PROJECT_VERSION 1, bundle id com.tokidiscover.app).
+   Local package: TokiDiscoverCore (../TokiDiscoverCore). Info.plist: Config/TokiDiscover-Info.plist. */
+}; rootObject = "TokiDiscover"; }

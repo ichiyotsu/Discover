@@ -1,0 +1,12 @@
+<Page x:Class="TokiDiscover.Views.LibraryPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="书库" FontSize="28" FontWeight="Bold" />
+    <!-- PillGroup-style segmented switch: 书签 / 历史 / 下载 -->
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button Content="书签" Click="Section_Click" Tag="0" /><Button Content="历史" Click="Section_Click" Tag="1" /><Button Content="下载" Click="Section_Click" Tag="2" />
+      <Button x:Name="ClearHistoryButton" Content="清空历史" Click="ClearHistory_Click" Visibility="Collapsed" />
+    </StackPanel>
+    <TextBlock x:Name="EmptyText" Opacity="0.6" TextWrapping="Wrap" />
+    <ListView x:Name="Items" />
+  </StackPanel>
+</Page>
