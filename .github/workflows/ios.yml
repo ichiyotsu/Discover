@@ -1,0 +1,11 @@
+name: iOS
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+        working-directory: ios/TokiDiscoverCore
+      - run: xcodebuild -project TokiDiscover.xcodeproj -scheme TokiDiscover -sdk iphonesimulator build CODE_SIGNING_ALLOWED=NO
+        working-directory: ios
