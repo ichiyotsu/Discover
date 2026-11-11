@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 public static class UpdateChecker
 {
     public const string ReleasesApi = "https://api.github.com/repos/ichiyotsu/tokidiscover/releases/latest";
-    public static string? ParseVersionFromAssetName(string name) => Regex.Match(name ?? "", @"(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)[0-9A-Za-z.]*)?)").Groups[1].Value is { Length: > 0 } v ? v : null;
+    public static string? ParseVersionFromAssetName(string name) => Regex.Match(name ?? "", @"(\d+\.\d+\.\d+(?:-(?:beta|alpha|rc|preview)\d+(?:\.\d+)*)?)").Groups[1].Value is { Length: > 0 } v ? v : null;
     public static string? ExtractLatestVersion(string releaseJson)
     {
         using var doc = JsonDocument.Parse(releaseJson); var root = doc.RootElement;
