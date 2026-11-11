@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import TokiDiscoverCore
 /// Owns tabs + library (UserDefaults JSON). Private tabs never write history.
 @MainActor final class AppModel: ObservableObject {
