@@ -10,8 +10,8 @@ struct LibraryView: View {
             Picker("", selection: $section) { Text("书签").tag(0); Text("历史").tag(1); Text("下载").tag(2) }.pickerStyle(.segmented)
             switch section {
             case 0: if model.bookmarks.isEmpty { Text("暂无书签 — 默认存入「默认」文件夹").foregroundStyle(.secondary) }
-                else { List(model.bookmarks) { b in VStack(alignment: .leading) { Text(b.title); Text("\(b.folder) · \(b.url)").font(.caption).foregroundStyle(.secondary) } }
-                    .onDelete { idx in idx.forEach { model.bookmarks.remove(at: $0) } } }
+                else { List { ForEach(model.bookmarks) { b in VStack(alignment: .leading) { Text(b.title); Text("\(b.folder) · \(b.url)").font(.caption).foregroundStyle(.secondary) } }
+                    .onDelete { idx in idx.forEach { model.bookmarks.remove(at: $0) } } } }
             case 1: VStack(alignment: .leading) { if !model.history.isEmpty { Button("清空历史") { model.history = [] } }
                 if model.history.isEmpty { Text("暂无历史 — 无痕标签页不会产生记录").foregroundStyle(.secondary) }
                 else { List(model.history) { h in VStack(alignment: .leading) { Text(h.title).lineLimit(1); Text(h.url).font(.caption).foregroundStyle(.secondary).lineLimit(1) } } } }
