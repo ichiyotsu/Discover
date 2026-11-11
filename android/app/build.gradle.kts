@@ -1,17 +1,33 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-plugins { alias(libs.plugins.android.application); alias(libs.plugins.kotlin.android); alias(libs.plugins.kotlin.compose) }
+plugins { alias(libs.plugins.android.application); alias(libs.plugins.kotlin.compose) }
+// AGP 9 has built-in Kotlin support: the org.jetbrains.kotlin.android plugin must NOT be applied.
+// Release versioning/signing are driven by environment (set by .github/workflows/release.yml),
+// same pattern as Tokinote. Local builds fall back to the defaults below and the debug key.
+val releaseVersionName: String = System.getenv("VERSION_NAME") ?: "0.1.0-beta1"
+val releaseVersionCode: Int = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
+val releaseKeystore: String? = System.getenv("KEYSTORE_FILE")
 android {
     namespace = "com.tokidiscover.app"
-    compileSdk = 36
+    compileSdk = 37 // Compose 1.12 / core-ktx 1.19 dependencies require compiling against API 37+
     defaultConfig {
         applicationId = "com.tokidiscover.app"
         minSdk = 26 // Android 8+ build floor; product target is Android 12+ (see README)
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0-beta1"
+        versionCode = releaseVersionCode
+        versionName = releaseVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildTypes { release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") } }
+    signingConfigs {
+        if (releaseKeystore != null) {
+            create("release") {
+                storeFile = file(releaseKeystore)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes { release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"); signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug") } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     buildFeatures { compose = true; buildConfig = true }
 }
