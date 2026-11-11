@@ -58,15 +58,16 @@ public sealed partial class MainWindow : Window
 
     // --- Min size via WM_GETMINMAXINFO subclass (same approach as Tokinote WindowSizing) ---
     [DllImport("user32.dll")] private static extern bool SetWindowSubclass(IntPtr hWnd, SubclassProc proc, nuint id, IntPtr data);
-    private delegate bool SubclassProc(IntPtr hWnd, uint msg, IntPtr w, IntPtr l, nuint id, IntPtr data);
+    private delegate IntPtr SubclassProc(IntPtr hWnd, uint msg, IntPtr w, IntPtr l, nuint id, IntPtr data);
     [StructLayout(LayoutKind.Sequential)] private struct PointL { public int X, Y; }
     [StructLayout(LayoutKind.Sequential)] private struct MinMaxInfo { public PointL Reserved, MaxSize, MaxPos, MinTrack, MaxTrack; }
-    [DllImport("user32.dll")] private static extern bool DefSubclassProc(IntPtr hWnd, uint msg, IntPtr w, IntPtr l);
+    [DllImport("user32.dll")] private static extern IntPtr DefSubclassProc(IntPtr hWnd, uint msg, IntPtr w, IntPtr l);
+    [DllImport("user32.dll")] private static extern uint GetDpiForWindow(IntPtr hwnd);
     private SubclassProc? _proc; private int _minW = 640, _minH = 480;
     private void SetMinSize(int wDip, int hDip)
     {
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var dpi = (int)Microsoft.UI.Win32Interop.GetDpiForWindow(hwnd);
+        var dpi = (int)GetDpiForWindow(hwnd);
         _minW = wDip * dpi / 96; _minH = hDip * dpi / 96;
         _proc = (h, msg, w, l, id, data) => { if (msg == 0x0024) { var m = Marshal.PtrToStructure<MinMaxInfo>(l); m.MinTrack = new PointL { X = _minW, Y = _minH }; Marshal.StructureToPtr(m, l, false); } return DefSubclassProc(h, msg, w, l); };
         SetWindowSubclass(hwnd, _proc, 1, IntPtr.Zero);
